@@ -480,6 +480,23 @@ def add_htrc_help_user(sharee_guid, sharee_email):
                         if vm["type"] == "RESEARCH-FULL":
                             update_vmtype(vm["vmid"],sharee_guid,True)
 
+def remove_htrc_help_user(sharee_guid):
+    conn = http.client.HTTPConnection(DC_API, PORT)
+    conn.request("GET", '/sloan-ws/listvms')
+    response = conn.getresponse()
+
+    if response.status == 200:
+        vms = json.loads(response.read())['vmsInfo']
+
+        for vm in vms:
+            if vm["vmState"] == "SHUTDOWN":
+                roles = vm["roles"]
+                for role in roles:
+                    if role["role"] == "OWNER_CONTROLLER" or role["role"] == "OWNER":
+                        print("Remove HTRC help user from capsule ID: " + vm["vmid"])
+                        delete_sharee(vm["vmid"], role["guid"], sharee_guid)
+
+
 
 def manage_controller(vm,guid,sharee_guid,action):
     headers = {'Content-Type': 'application/x-www-form-urlencoded',
@@ -765,6 +782,10 @@ if __name__ == '__main__':
     deleteimage.add_argument('image_id')
 
 
+    removehelpuser = subparsers.add_parser('removehelpuser', description='Remove HTRC help user from all capsules.')
+    removehelpuser.add_argument('sharee_guid')
+    removehelpuser.add_argument('sharee_email')
+
     parsed = parser.parse_args()
 
     if parsed.sub_commands == 'delete':
@@ -932,3 +953,7 @@ if __name__ == '__main__':
 
 
 
+
+    if parsed.sub_commands == 'removehelpuser':
+        print('Remove HTRC help user ' + parsed.sharee_email + ' from all capsules.')
+        remove_htrc_help_user(parsed.sharee_guid)
