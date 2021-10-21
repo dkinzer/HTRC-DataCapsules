@@ -362,5 +362,32 @@ ssh -o StrictHostKeyChecking=no  -i $GMC_PRIVATE_KEY dcuser@$VM_IP_ADDR "/opt/an
 
 ssh -o StrictHostKeyChecking=no  -i $GMC_PRIVATE_KEY dcuser@$VM_IP_ADDR "/bin/rm -r /tmp/guest_scripts" >> $VM_DIR/install_python_packages_out 2>&1
 
+# Set Google Chrome as the default browser
+if [[ -z "$SET_CHROME_DEFAULT" ]]; then
+  scp -o StrictHostKeyChecking=no  -i $GMC_PRIVATE_KEY $GUEST_UPLOADS/mimeapps.list dcuser@$VM_IP_ADDR:/home/dcuser/.config/mimeapps.list > $VM_DIR/set_chrome_default_out 2>&1
+  echo "SET_CHROME_DEFAULT="$(date +%m-%d-%Y) >> $VM_DIR/config
+  logger "$VM_DIR set chrome as the default browser"
+fi
+
+# Install HTRC-JupyterNotebooks
+if [[ -z "$INSTALL_JUPYTER_NOTE_BOOKS" ]]; then
+  scp -o StrictHostKeyChecking=no  -i $ROOT_PRIVATE_KEY -r $GUEST_UPLOADS/jupyter-notebooks root@$VM_IP_ADDR:/tmp > $VM_DIR/install_jupyter_notebooks_out 2>&1
+  ssh -o StrictHostKeyChecking=no  -i $ROOT_PRIVATE_KEY root@$VM_IP_ADDR "/tmp/jupyter-notebooks/install.sh" >> $VM_DIR/install_jupyter_notebooks_out 2>&1
+  echo "INSTALL_JUPYTER_NOTE_BOOKS="$(date +%m-%d-%Y) >> $VM_DIR/config
+  echo "CHANGE_ICON_NAME_JNB="$(date +%m-%d-%Y) >> $VM_DIR/config
+  logger "$VM_DIR installed HTRC-JupyterNotebooks"
+fi
+
+# Load config file to get CHANGE_ICON_NAME_JNB config value
+. $VM_DIR/config
+
+#Change JupyterNotebook icon name
+if [[ -z "$CHANGE_ICON_NAME_JNB" ]]; then
+  scp -o StrictHostKeyChecking=no  -i $GMC_PRIVATE_KEY $GUEST_UPLOADS/jupyter-notebooks/JupyterNotebooks/notebook.desktop dcuser@$VM_IP_ADDR:/home/dcuser/Desktop > $VM_DIR/change_icon_name_jnb_out 2>&1
+  echo "CHANGE_ICON_NAME_JNB="$(date +%m-%d-%Y) >> $VM_DIR/config
+  logger "$VM_DIR change icon name of HTRC-JupyterNotebooks"
+fi
+
+
 # Return successfully (only reaches here if no errors occur)
 exit 0
