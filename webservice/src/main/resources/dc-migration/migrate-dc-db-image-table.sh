@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# ./migrate-dc-db.sh <user> <passwd> <old_db> <copy_of_old_db> <new_db> <new_db_schema>
+# ./migrate-dc-db-image-table.sh <user> <passwd> <old_db> <copy_of_old_db> <new_db> <new_db_schema>
 #
 
 # Creating a new database to copy old one
