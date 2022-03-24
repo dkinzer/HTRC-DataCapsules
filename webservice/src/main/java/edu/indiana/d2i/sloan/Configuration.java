@@ -158,6 +158,13 @@ public final class Configuration {
 		/*No of sharees*/
 		public static final String MAX_NO_OF_SHAREES = "max.no.of.sharees";
 
+		/* OpenStack */
+		public static final String OPENSTACK_ENDPOINT = "openstack.endpoint";
+		public static final String OPENSTACK_USER = "openstack.user";
+		public static final String OPENSTACK_PASSWORD = "openstack.pass";
+		public static final String OPENSTACK_DOMAIN = "openstack.domain";
+		public static final String OPENSTACK_PROJECT = "openstack.project";
+
 	}
 	
 	public static synchronized Configuration getInstance() {
