@@ -63,6 +63,12 @@
 		<url-pattern>/exitsharee</url-pattern>
 		<url-pattern>/addsupportuser</url-pattern>
 		<url-pattern>/checkdownloadability</url-pattern>
+		<url-pattern>/activateimage</url-pattern>
+		<url-pattern>/checkimagename</url-pattern>
+		<url-pattern>/deleteimage</url-pattern>
+		<url-pattern>/getimage</url-pattern>
+		<url-pattern>/shareimage</url-pattern>
+		<url-pattern>/requestimagedelete</url-pattern>
 	</filter-mapping>
 
 	<servlet-mapping>

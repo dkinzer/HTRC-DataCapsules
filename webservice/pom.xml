@@ -4,7 +4,7 @@
 	<groupId>edu.indiana.d2i.sloan</groupId>
 	<artifactId>sloan-ws</artifactId>
 	<packaging>war</packaging>
-	<version>1.12-SNAPSHOT</version>
+	<version>1.14-SNAPSHOT</version>
 	<name>sloan-ws</name>
 	<url>http://maven.apache.org</url>
 
@@ -137,12 +137,12 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
-			<version>2.13.2</version>
+			<version>2.17.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<version>2.13.2</version>
+			<version>2.17.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -154,14 +154,14 @@
 
 	<build>
 		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.0</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
+<!--			<plugin>-->
+<!--				<artifactId>maven-compiler-plugin</artifactId>-->
+<!--				<version>3.0</version>-->
+<!--				<configuration>-->
+<!--					<source>1.6</source>-->
+<!--					<target>1.6</target>-->
+<!--				</configuration>-->
+<!--			</plugin>-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -180,6 +180,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+				<version>3.0</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>

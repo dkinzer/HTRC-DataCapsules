@@ -344,6 +344,13 @@ if [[ -z "$DISABLE_NEW_RELEASE" ]]; then
       logger "$VM_DIR Disabled new Ubuntu releases."
 fi
 
+# Check whether Keycloak client's email is verified
+if [[ -z "$EMAIL_VERIFIED" ]]; then
+      $KEYCLOAK_CLIENT -config $KEYCLOAK_CONFIG_FILE --username $CLIENT_ID setemailverifiedsingle 2>&1
+      echo "EMAIL_VERIFIED=1" >> $VM_DIR/config
+      logger "$VM_DIR set EMAIL_VERIFIED for DC agent created in Custos."
+fi
+
 # Check whether authorized_keys file available in VM_DIR. If not get the copy from the VM
 if [ ! -e $VM_DIR/authorized_keys ]; then
       scp -o StrictHostKeyChecking=no -i $ROOT_PRIVATE_KEY root@$VM_IP_ADDR:$DC_USER_KEY_FILE $VM_DIR/authorized_keys >> $VM_DIR/copy_authorized_keys_out 2>&1
