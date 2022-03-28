@@ -32,3 +32,4 @@ webservice/src/main/resources/dc-migration/mysql-dumps
 /webservice/.DS_Store
 
 
+/webservice/.gradle/
