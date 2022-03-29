@@ -16,13 +16,13 @@
 package edu.indiana.d2i.sloan.bean;
 
 public class CreateVmRequestBean {
-	private String userName, imageId, imageName, vmid, vncLoginID, vncLoginPasswd, workDir;
+	private String userName, imageId, imageName, vmid, vmName, vncLoginID, vncLoginPasswd, workDir;
 	private int memory, vcpu, volumeSizeInGB;
 	private Boolean consent, full_access;
 	private String type, title, desc_nature, desc_requirement, desc_links,
 			desc_outside_data, rr_data_files, rr_result_usage, desc_shared;
 
-	public CreateVmRequestBean(String userName, String imageId, String imageName, String vmid,
+	public CreateVmRequestBean(String userName, String imageId, String imageName, String vmid, String vmName,
 			String vncLoginID, String vncLoginPasswd, int memory, int vcpu,
 			int volumeSizeInGB, String workDir, String type, String title, Boolean consent, String desc_nature,
 			String desc_requirement, String desc_links, String desc_outside_data,
@@ -31,6 +31,7 @@ public class CreateVmRequestBean {
 		this.imageId = imageId;
 		this.imageName = imageName;
 		this.vmid = vmid;
+		this.vmName = vmName;
 		this.vncLoginID = vncLoginID;
 		this.vncLoginPasswd = vncLoginPasswd;
 		this.memory = memory;
@@ -48,6 +49,14 @@ public class CreateVmRequestBean {
 		this.rr_data_files = rr_data_files;
 		this.rr_result_usage = rr_result_usage;
 		this.desc_shared = desc_shared;
+	}
+
+	public String getVmName() {
+		return vmName;
+	}
+
+	public void setVmName(String vmName) {
+		this.vmName = vmName;
 	}
 
 	public String getImageId() {

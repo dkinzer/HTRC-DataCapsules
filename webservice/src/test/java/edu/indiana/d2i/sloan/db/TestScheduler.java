@@ -150,7 +150,7 @@ public class TestScheduler {
 		try {
 			for (int i = 0; i < scheduled; i++) {
 				CreateVmRequestBean request = new CreateVmRequestBean("user-"
-						+ i,  "imageid-"+i,"imagename-"+i, "vmid-" + i, "vncusername-" + i,
+						+ i,  "imageid-"+i,"imagename-"+i, "vmid-" + i, "vmname-" + i, "vncusername-" + i,
 						"vncpassword-" + i, 1024, 2, 10, "/path/to/work/dir",
 						"DEMO", null, null, null, null, null, null, null, null, null, null);
 				SchedulerFactory.getInstance().schedule(request);
@@ -160,7 +160,7 @@ public class TestScheduler {
 		}
 
 		CreateVmRequestBean request2 = new CreateVmRequestBean("user-2","imageid",
-				"imagename", "vmid-" + scheduled, "vmusername-2",
+				"imagename", "vmid-" + scheduled, "vmname-" + scheduled, "vmusername-2",
 				"vmpassword-2", 1024, 2, 10, "/path/to/work/dir",
 				"DEMO", null, null, null, null, null, null, null, null,null, null);
 		SchedulerFactory.getInstance().schedule(request2); // exception
@@ -178,7 +178,7 @@ public class TestScheduler {
 		// schedule some
 		for (int i = 0; i < scheduled; i++) {
 			CreateVmRequestBean request = new CreateVmRequestBean("user-" + i,"imageid-"+i,
-					"imagename-"+i, "vmid-" + i, "vmusername-" + i, "vmpassword-"
+					"imagename-"+i, "vmid-" + i, "vmname-" + i, "vmusername-" + i, "vmpassword-"
 							+ i, 1024, 2, 10, "/path/to/work/dir",
 					"DEMO", null, null, null, null, null, null, null, null, null, null );
 			SchedulerFactory.getInstance().schedule(request);
@@ -195,7 +195,7 @@ public class TestScheduler {
 		// schedule even more
 		for (int i = scheduled; i < records; i++) {
 			CreateVmRequestBean request = new CreateVmRequestBean("user-" + i,"imageid-"+i,
-					"imagename-"+i, "vmid-" + i, "vmusername-" + i, "vmpassword-"
+					"imagename-"+i, "vmid-" + i, "vmname-" + i, "vmusername-" + i, "vmpassword-"
 							+ i, 1024, 2, 10, "/path/to/work/dir",
 					"DEMO", null, null, null, null, null, null, null, null, null, null );
 			SchedulerFactory.getInstance().schedule(request);

@@ -592,7 +592,7 @@ public class DBOperations {
 		return res.get(0);
 	}
 
-	public void addVM(String userName, String vmid, String imageId, String imageName,
+	public void addVM(String userName, String vmid, String vmName, String imageId, String imageName,
 			String vncLoginId, String vncLoginPwd, VMPorts host, String created_at,
 			String workDir, int numCPUs, int memorySize, int diskSpace, String type, String title, Boolean consent,
 			String desc_nature, String desc_requirement, String desc_links, String desc_outside_data,
@@ -603,6 +603,8 @@ public class DBOperations {
 								+ DBSchema.VmTable.TABLE_NAME
 								+ " ("
 								+ DBSchema.VmTable.VM_ID
+								+ ","
+								+ DBSchema.VmTable.VM_NAME
 								+ ","
 								+ DBSchema.VmTable.STATE
 								+ ","
@@ -654,9 +656,9 @@ public class DBOperations {
 								+ ","
 								+ DBSchema.VmTable.DESC_SHARED
 								+ ") VALUES"
-								+ "(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %d, %d, \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %d, %d, %d, \"%s\"" +
+								+ "(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %d, %d, \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %d, %d, %d, \"%s\"" +
 								", \"%s\", %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-						vmid, VMState.CREATE_PENDING.toString(),
+						vmid,vmName, VMState.CREATE_PENDING.toString(),
 						VMMode.NOT_DEFINED.toString(), host.publicip, created_at,
 						host.sshport, host.vncport, workDir, imageId, imageName,
 						vncLoginId, vncLoginPwd, numCPUs, memorySize,

@@ -55,6 +55,8 @@ INSERT INTO $5.vmhosts SELECT * from $4.vmhosts;
 
 # Migrate vms table
 USE $4;
+ALTER TABLE vms ADD vmname VARCHAR(128) NOT NULL AFTER vmid;
+UPDATE vms SET vmname=vmid;
 ALTER TABLE vms ADD COLUMN imageid VARCHAR(128) DEFAULT NULL after workingdir;
 UPDATE vms SET imageid="f3c2a554-5197-492f-a0fe-03e4330a5938" where imagename="ubuntu-16-04";
 UPDATE vms SET imageid="f6f02532-05a7-4ffd-8a90-43b42113671f" where imagename="ubuntu-16-04-iso";

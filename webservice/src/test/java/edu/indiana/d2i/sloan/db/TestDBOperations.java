@@ -236,7 +236,7 @@ public class TestDBOperations {
 			
 			portsExpected[index*2] = 2000 + index*2;
 			portsExpected[index*2+1] = 2000 + index*2 + 1;
-			DBOperations.getInstance().addVM(userName, vmid, "imageid-"+(index%imageCnt),"imagename-"+(index%imageCnt),
+			DBOperations.getInstance().addVM(userName, vmid,vmid, "imageid-"+(index%imageCnt),"imagename-"+(index%imageCnt),
 			"vncusername", "vncpassword", host, created_at, workDir, 2, 1024, 10
 					,"DEMO", null, null, null, null, null, null, null, null, null, null);
 		}
@@ -336,7 +336,7 @@ public class TestDBOperations {
 		loadDataToVmTable(count);
 		
 		CreateVmRequestBean request = new CreateVmRequestBean("username-0", null,
-				null, null, null, null,
+				null, null, null, null, null,
 				Integer.parseInt(Constants.DEFAULT_USER_MEMORY_QUOTA_IN_MB),
 				Integer.parseInt(Constants.DEFAULT_USER_CPU_QUOTA_IN_NUM) - 1,
 				Integer.parseInt(Constants.DEFAULT_USER_DISK_QUOTA_IN_GB) - 1,
@@ -395,7 +395,7 @@ public class TestDBOperations {
 			String vmid = "vmid-" + index;
 			VMPorts host = new VMPorts("192.168.0." + (index+2), 2000 + index*2, 2000 + index*2 + 1);
 			String workDir = "/var/instance/" + "vmid-" + index;
-			DBOperations.getInstance().addVM(userName, vmid, "imageid-0", "imagename-0",
+			DBOperations.getInstance().addVM(userName, vmid,vmid, "imageid-0", "imagename-0",
 			"vncusername", "vncpassword", host, created_at, workDir, 2, 1024, 10
 					,"DEMO", null, null, null, null, null, null, null, null, null, null);
 		}

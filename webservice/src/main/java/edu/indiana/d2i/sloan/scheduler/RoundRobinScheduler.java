@@ -50,7 +50,7 @@ public class RoundRobinScheduler extends Scheduler {
 				String created_at = DATE_FORMATOR.format(dt);
 
 				DBOperations.getInstance().addVM(request.getUserName(),
-						request.getVmId(), request.getImageId(), request.getImageName(),
+						request.getVmId(), request.getVmName(), request.getImageId(), request.getImageName(),
 						request.getVncLoginID(), request.getVncLoginPasswd(),
 						vmhost, created_at, workDir, request.getVcpu(),
 						request.getMemory(), request.getVolumeSizeInGB(),

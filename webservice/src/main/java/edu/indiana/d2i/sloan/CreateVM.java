@@ -50,6 +50,7 @@ public class CreateVM {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createVM(
+			@FormParam("vmname") String vmName,
 			@FormParam("imageid") String imageId,
 			@FormParam("loginusername") String loginusername,
 			@FormParam("loginpassword") String loginpassword,
@@ -122,11 +123,17 @@ public class CreateVM {
 
 			// vm parameters
 			String vmid = UUID.randomUUID().toString();
+
+			//if vm name is not provided, assign vmid to vmname
+			if(vmName == null) vmName = vmid;
+
+			logger.debug("VM NAME: " + vmName);
+
 			String workDir = FilenameUtils.concat(
 				Configuration.getInstance().getString(
 					Configuration.PropertyName.DEFAULT_VM_WORKDIR_PREFIX), vmid);
 			CreateVmRequestBean request = new CreateVmRequestBean(userName,
-					imageId, imageName, vmid, loginusername, loginpassword, memory,
+					imageId, imageName, vmid, vmName, loginusername, loginpassword, memory,
 					vcpu, volumeSizeInGB, workDir, type, title, consent, desc_nature, desc_requirement,  desc_links,
 					desc_outside_data, rr_data_files, rr_result_usage, full_access, null);
 			logger.info("User " + userName + " tries to create vm " + request);
