@@ -54,6 +54,7 @@ public class QueryVM {
 			@Context HttpHeaders httpHeaders,
 			@Context HttpServletRequest httpServletRequest) {		
 		String userName = httpServletRequest.getHeader(Constants.USER_NAME);
+		String userEmail = httpServletRequest.getHeader(Constants.USER_EMAIL);
 		/*String userEmail = httpServletRequest.getHeader(Constants.USER_EMAIL);
 		if (userEmail == null) userEmail = "";
 
@@ -62,12 +63,12 @@ public class QueryVM {
 		if (operator == null) operator = userName;
 		if (operatorEmail == null) operatorEmail = "";*/
 
-		if (userName == null) {
-			logger.error("Username is not present in http header.");
+		if (userName == null || userEmail == null) {
+			logger.error("Username or email is not present in http header.");
 			return Response
 					.status(500)
 					.entity(new ErrorBean(500,
-							"Username is not present in http header.")).build();
+							"Username or email is not present in http header.")).build();
 		}
 
 		// read from db and return first
@@ -80,8 +81,14 @@ public class QueryVM {
 			//DBOperations.getInstance().insertUserIfNotExists(operator, operatorEmail);
 			boolean pub_key_exists = false;
 			boolean tou = false;
+			String existingEmail = null;
 			try {
-				pub_key_exists = DBOperations.getInstance().getUserPubKey(userName) == null ? false : true;
+				existingEmail = DBOperations.getInstance().getUserEmail(userName);
+				if(!existingEmail.equals(userEmail)){
+					UpdateUserEmail updateUserEmail = new UpdateUserEmail();
+					updateUserEmail.updateEmail(userName, userEmail);
+				}
+				pub_key_exists = DBOperations.getInstance().getUserPubKey(userName) != null;
 				tou = DBOperations.getInstance().getUserTOU(userName);
 			} catch (NoItemIsFoundInDBException e) {
 				logger.debug("Cannot retrieve public key or TOU of user since '" + userName + "' is not in the database");

@@ -57,21 +57,23 @@ public class UpdateUserEmail {
 							"Username is not present in http header.")).build();
 		}
 
-		try {
-			//DBOperations.getInstance().insertUserIfNotExists(userName, userEmail);
-			//DBOperations.getInstance().insertUserIfNotExists(operator, operatorEmail);
+		return updateEmail(userName, userEmail);
+	}
 
+	public Response updateEmail(String userName, String userEmail){
+
+		try {
 			logger.info("User " + userName + " tries to update the email to " + userEmail);
 			if(DBOperations.getInstance().userExists(userName)) {
 				DBOperations.getInstance().updateUserEmail(userName, userEmail);
 				logger.info("Email of user '" + userName + "' was updated in database successfully!");
-                return Response.status(200).build();
+				return Response.status(200).build();
 			} else {
 				logger.info("User '" + userName + "' is not in database, hence not updating email!");
-                return Response
-                        .status(400)
-                        .entity(new ErrorBean(400,
-                                "User '" + userName + "' is not in database, hence not updating email!")).build();
+				return Response
+						.status(400)
+						.entity(new ErrorBean(400,
+								"User '" + userName + "' is not in database, hence not updating email!")).build();
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
