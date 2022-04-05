@@ -285,7 +285,7 @@ public class TestDBOperations {
 
 		// delete vm
 		for (int i = 0; i < vmids.size(); i++) {
-			VmInfoBean vinfo = new VmInfoBean(vmids.get(i), null, null, null,
+			VmInfoBean vinfo = new VmInfoBean(vmids.get(i),vmids.get(i), null, null, null,
 				null, null, 0, 0, 2, 1024, 10, VMMode.NOT_DEFINED, VMState.CREATE_PENDING, null, null,
 				null, null, null, null, null, null
 					, "DEMO", null, null, null, null, null, null, null, null, null, null, null);
@@ -345,7 +345,7 @@ public class TestDBOperations {
 		Assert.assertTrue(DBOperations.getInstance().quotasNotExceedLimit(request));
 		Assert.assertFalse(DBOperations.getInstance().quotasNotExceedLimit(request));
 		
-		VmInfoBean vmInfo = new VmInfoBean("vmid-0", null, null, null, null, null,
+		VmInfoBean vmInfo = new VmInfoBean("vmid-0", "vmname-0", null, null, null, null, null,
 			2000, 2001, request.getVcpu(), request.getMemory(), request.getVolumeSizeInGB(),
 				VMMode.MAINTENANCE, VMState.RUNNING, null, null, null, null, null, null, null, null
 				, "DEMO", null, null, null, null, null, null, null, null, null, null, null);
@@ -421,7 +421,7 @@ public class TestDBOperations {
 		
 		// delete vm
 		for (int i = 0; i < 3; i++) {
-			VmInfoBean vinfo = new VmInfoBean("vmid-"+i, null, null, null,
+			VmInfoBean vinfo = new VmInfoBean("vmid-"+i, "vmname-"+i, null, null, null,
 					null, null, 0, 0, 2, 1024, 10, VMMode.NOT_DEFINED, VMState.CREATE_PENDING, null, null,
 					null, null, null, null, null, null
 					, "DEMO", null, null, null, null, null, null, null, null, null, null, null);

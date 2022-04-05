@@ -55,6 +55,9 @@ public class VmStatusBean {
 	public String getVmid() {
 		return vminfo.getVmid();
 	}
+	public String getVmname() {
+		return vminfo.getVmname();
+	}
 	public String getVNCLoginId() {
 		return vminfo.getVNCloginId();
 	}

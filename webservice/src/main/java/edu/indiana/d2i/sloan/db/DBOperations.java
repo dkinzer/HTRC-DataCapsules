@@ -172,6 +172,7 @@ public class DBOperations {
 						.collect(Collectors.toList()).get(0);
 				VmInfoBean vminfo = new VmInfoBean(
 						rs.getString(DBSchema.VmTable.VM_ID),
+						rs.getString(DBSchema.VmTable.VM_NAME),
 						rs.getString(DBSchema.VmTable.HOST),
 						DATE_FORMATOR.format(rs.getTimestamp(DBSchema.VmTable.CREATED_AT)),
 						rs.getString(DBSchema.VmTable.WORKING_DIR),
@@ -477,7 +478,8 @@ public class DBOperations {
 	public List<VmInfoBean> getVmInfo(String userName) throws SQLException {
 		String sql = String.format("SELECT " + DBSchema.VmTable.VM_MODE + ","
 				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.VM_ID
-				+ "," + DBSchema.VmTable.HOST + "," + DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.CREATED_AT + ","
+				+ "," + DBSchema.VmTable.HOST + "," + DBSchema.VmTable.VM_NAME + ","
+				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.CREATED_AT + ","
 				+ DBSchema.VmTable.STATE + "," + DBSchema.VmTable.SSH_PORT
 				+ "," + DBSchema.VmTable.VNC_PORT + ","
 				+ DBSchema.VmTable.WORKING_DIR + ","
@@ -512,8 +514,8 @@ public class DBOperations {
 	public VmInfoBean getVmInfo(String userName, String vmid)
 			throws SQLException, NoItemIsFoundInDBException {
 		String sql = String.format("SELECT " + DBSchema.VmTable.VM_MODE + ","
-				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.VM_ID
-				+ "," + DBSchema.VmTable.HOST + "," + DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.CREATED_AT + ","
+				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.VM_ID + ","
+				+ DBSchema.VmTable.VM_NAME + "," + DBSchema.VmTable.HOST + "," + DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.CREATED_AT + ","
 				+ DBSchema.VmTable.STATE + "," + DBSchema.VmTable.SSH_PORT
 				+ "," + DBSchema.VmTable.VNC_PORT + ","
 				+ DBSchema.VmTable.WORKING_DIR + ","

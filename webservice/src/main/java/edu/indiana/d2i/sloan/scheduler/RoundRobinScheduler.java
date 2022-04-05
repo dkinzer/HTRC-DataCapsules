@@ -65,7 +65,7 @@ public class RoundRobinScheduler extends Scheduler {
 				String email = DBOperations.getInstance().getUserEmail(request.getUserName());
 				roles.add(new VmUserRole(email, VMRole.OWNER_CONTROLLER, true, request.getUserName(), request.isFull_access()));
 
-				return new VmInfoBean(request.getVmId(), vmhost.publicip, created_at, workDir,
+				return new VmInfoBean(request.getVmId(), request.getVmName(), vmhost.publicip, created_at, workDir,
 						null, // image path
 						null, // policy path
 						vmhost.sshport, vmhost.vncport, 
