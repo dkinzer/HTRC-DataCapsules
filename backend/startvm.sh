@@ -365,7 +365,7 @@ scp -o StrictHostKeyChecking=no  -i $ROOT_PRIVATE_KEY $VM_DIR/authorized_keys ro
 # update htrc package
 logger "$VM_DIR Update htrc package"
 scp -o StrictHostKeyChecking=no  -i $GMC_PRIVATE_KEY -r $GUEST_SCRIPTS dcuser@$VM_IP_ADDR:/tmp/ > $VM_DIR/install_python_packages_out 2>&1
-ssh -o StrictHostKeyChecking=no  -i $GMC_PRIVATE_KEY dcuser@$VM_IP_ADDR "/opt/anaconda/bin/pip install --upgrade pip && /opt/anaconda/bin/pip install --upgrade htrc-feature-reader && /opt/anaconda/bin/pip install --upgrade htrc && /opt/anaconda/bin/python /tmp/guest_scripts/download_nltk_data.py" >> $VM_DIR/install_python_packages_out 2>&1
+ssh -o StrictHostKeyChecking=no  -i $GMC_PRIVATE_KEY dcuser@$VM_IP_ADDR "/opt/anaconda/bin/pip install --upgrade pip htrc-feature-reader htrc && /opt/anaconda/bin/python /tmp/guest_scripts/download_nltk_data.py" >> $VM_DIR/install_python_packages_out 2>&1
 
 ssh -o StrictHostKeyChecking=no  -i $GMC_PRIVATE_KEY dcuser@$VM_IP_ADDR "/bin/rm -r /tmp/guest_scripts" >> $VM_DIR/install_python_packages_out 2>&1
 
@@ -394,6 +394,10 @@ if [[ -z "$CHANGE_ICON_NAME_JNB" ]]; then
   echo "CHANGE_ICON_NAME_JNB="$(date +%m-%d-%Y) >> $VM_DIR/config
   logger "$VM_DIR change icon name of HTRC-JupyterNotebooks"
 fi
+
+#Update HTRC-JupyterNotebooks git repository
+logger "$VM_DIR Update HTRC-JupyterNotebooks git repository"
+ssh -o StrictHostKeyChecking=no  -i $GMC_PRIVATE_KEY dcuser@$VM_IP_ADDR "cd /home/dcuser/HTRC-JupyterNotebooks;/usr/bin/git stash;/usr/bin/git pull;/usr/bin/git stash apply" > $VM_DIR/update-jnb-git 2>&1
 
 
 # Return successfully (only reaches here if no errors occur)
