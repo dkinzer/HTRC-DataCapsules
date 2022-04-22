@@ -48,7 +48,9 @@
 		<url-pattern>/show</url-pattern>
 		<url-pattern>/stopvm</url-pattern>
 		<url-pattern>/switchvm</url-pattern>
-		<url-pattern>/listimage</url-pattern>
+		<url-pattern>/listactiveimages</url-pattern>
+		<url-pattern>/listallimages</url-pattern>
+		<url-pattern>/listmyimages</url-pattern>
 		<url-pattern>/updateuserkey</url-pattern>
 		<url-pattern>/updateusertou</url-pattern>
 		<url-pattern>/updatevm</url-pattern>
