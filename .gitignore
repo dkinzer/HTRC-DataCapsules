@@ -33,3 +33,4 @@ webservice/src/main/resources/dc-migration/mysql-dumps
 
 
 /webservice/.gradle/
+/docker
