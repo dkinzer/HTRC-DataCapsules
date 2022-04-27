@@ -236,7 +236,7 @@ public class TestDBOperations {
 			
 			portsExpected[index*2] = 2000 + index*2;
 			portsExpected[index*2+1] = 2000 + index*2 + 1;
-			DBOperations.getInstance().addVM(userName, vmid, "imagename-"+(index%imageCnt), 
+			DBOperations.getInstance().addVM(userName, vmid,vmid, "imageid-"+(index%imageCnt),"imagename-"+(index%imageCnt),
 			"vncusername", "vncpassword", host, created_at, workDir, 2, 1024, 10
 					,"DEMO", null, null, null, null, null, null, null, null, null, null);
 		}
@@ -285,9 +285,9 @@ public class TestDBOperations {
 
 		// delete vm
 		for (int i = 0; i < vmids.size(); i++) {
-			VmInfoBean vinfo = new VmInfoBean(vmids.get(i), null, null, null,
+			VmInfoBean vinfo = new VmInfoBean(vmids.get(i),vmids.get(i), null, null, null,
 				null, null, 0, 0, 2, 1024, 10, VMMode.NOT_DEFINED, VMState.CREATE_PENDING, null, null,
-				null, null, null, null, null
+				null, null, null, null, null, null
 					, "DEMO", null, null, null, null, null, null, null, null, null, null, null);
 			DBOperations.getInstance().deleteVMs(userNames.get(i), vinfo);
 		}		
@@ -325,7 +325,7 @@ public class TestDBOperations {
 		int count = 3;
 		loadDataToImageTable(count);
 		for (int i = 0; i < count; i++) {
-			String imagePath = DBOperations.getInstance().getImagePath("imagename-" + i);
+			String imagePath = DBOperations.getInstance().getImagePath("imageid-" + i);
 			Assert.assertEquals("/var/instance/imagename-" + i, imagePath);
 		}
 	}
@@ -335,19 +335,19 @@ public class TestDBOperations {
 		int count = 3;
 		loadDataToVmTable(count);
 		
-		CreateVmRequestBean request = new CreateVmRequestBean("username-0",
-				null, null, null, null, 
-				Integer.valueOf(Constants.DEFAULT_USER_MEMORY_QUOTA_IN_MB),
-				Integer.valueOf(Constants.DEFAULT_USER_CPU_QUOTA_IN_NUM) - 1,
-				Integer.valueOf(Constants.DEFAULT_USER_DISK_QUOTA_IN_GB) - 1, 
+		CreateVmRequestBean request = new CreateVmRequestBean("username-0", null,
+				null, null, null, null, null,
+				Integer.parseInt(Constants.DEFAULT_USER_MEMORY_QUOTA_IN_MB),
+				Integer.parseInt(Constants.DEFAULT_USER_CPU_QUOTA_IN_NUM) - 1,
+				Integer.parseInt(Constants.DEFAULT_USER_DISK_QUOTA_IN_GB) - 1,
 				"/path/to/work/dir", "DEMO", null, null, null, null, null, null, null, null, null ,null);
 		
 		Assert.assertTrue(DBOperations.getInstance().quotasNotExceedLimit(request));
 		Assert.assertFalse(DBOperations.getInstance().quotasNotExceedLimit(request));
 		
-		VmInfoBean vmInfo = new VmInfoBean("vmid-0", null, null, null, null, null,
+		VmInfoBean vmInfo = new VmInfoBean("vmid-0", "vmname-0", null, null, null, null, null,
 			2000, 2001, request.getVcpu(), request.getMemory(), request.getVolumeSizeInGB(),
-				VMMode.MAINTENANCE, VMState.RUNNING, null, null, null, null, null, null, null
+				VMMode.MAINTENANCE, VMState.RUNNING, null, null, null, null, null, null, null, null
 				, "DEMO", null, null, null, null, null, null, null, null, null, null, null);
 		DBOperations.getInstance().deleteVMs("username-0", vmInfo);
 		
@@ -395,7 +395,7 @@ public class TestDBOperations {
 			String vmid = "vmid-" + index;
 			VMPorts host = new VMPorts("192.168.0." + (index+2), 2000 + index*2, 2000 + index*2 + 1);
 			String workDir = "/var/instance/" + "vmid-" + index;
-			DBOperations.getInstance().addVM(userName, vmid, "imagename-0", 
+			DBOperations.getInstance().addVM(userName, vmid,vmid, "imageid-0", "imagename-0",
 			"vncusername", "vncpassword", host, created_at, workDir, 2, 1024, 10
 					,"DEMO", null, null, null, null, null, null, null, null, null, null);
 		}
@@ -421,9 +421,9 @@ public class TestDBOperations {
 		
 		// delete vm
 		for (int i = 0; i < 3; i++) {
-			VmInfoBean vinfo = new VmInfoBean("vmid-"+i, null, null, null,
+			VmInfoBean vinfo = new VmInfoBean("vmid-"+i, "vmname-"+i, null, null, null,
 					null, null, 0, 0, 2, 1024, 10, VMMode.NOT_DEFINED, VMState.CREATE_PENDING, null, null,
-					null, null, null, null, null
+					null, null, null, null, null, null
 					, "DEMO", null, null, null, null, null, null, null, null, null, null, null);
 			DBOperations.getInstance().deleteVMs(userName, vinfo);
 		}

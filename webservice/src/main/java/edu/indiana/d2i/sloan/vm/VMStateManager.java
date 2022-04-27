@@ -34,11 +34,10 @@ public class VMStateManager {
 	}
 	
 	public static boolean isPendingState(VMState state) {
-		return (state == VMState.CREATE_PENDING || state == VMState.LAUNCH_PENDING ||
+		return state == VMState.CREATE_PENDING || state == VMState.LAUNCH_PENDING ||
 				state == VMState.SHUTDOWN_PENDING || state == VMState.DELETE_PENDING ||
-				state == VMState.SWITCH_TO_MAINTENANCE_PENDING || 
-				state == VMState.SWITCH_TO_SECURE_PENDING || state == VMState.MIGRATE_PENDING)
-				? true: false;
+				state == VMState.SWITCH_TO_MAINTENANCE_PENDING ||
+				state == VMState.SWITCH_TO_SECURE_PENDING || state == VMState.MIGRATE_PENDING || state == VMState.IMAGE_SHARE_PENDING;
 	}
 
 	public static boolean isValidTransition(VMState src, VMState target) {
@@ -54,6 +53,10 @@ public class VMStateManager {
 				break;
 
 			case LAUNCH_PENDING:
+
+			case SWITCH_TO_SECURE_PENDING :
+
+			case SWITCH_TO_MAINTENANCE_PENDING :
 				if (target == VMState.RUNNING || target == VMState.SHUTDOWN_PENDING
 						|| target == VMState.SHUTDOWN
 						|| target == VMState.DELETE_PENDING) {
@@ -71,22 +74,6 @@ public class VMStateManager {
 				}
 				break;
 
-			case SWITCH_TO_MAINTENANCE_PENDING :
-				if (target == VMState.RUNNING || target == VMState.SHUTDOWN_PENDING
-						|| target == VMState.SHUTDOWN
-						|| target == VMState.DELETE_PENDING) {
-					canTrasist = true;
-				}
-				break;
-
-			case SWITCH_TO_SECURE_PENDING :
-				if (target == VMState.RUNNING || target == VMState.SHUTDOWN_PENDING
-						|| target == VMState.SHUTDOWN
-						|| target == VMState.DELETE_PENDING) {
-					canTrasist = true;
-				}
-				break;
-
 			case SHUTDOWN_PENDING :
 				if (target == VMState.SHUTDOWN || target == VMState.DELETE_PENDING) {
 					canTrasist = true;
@@ -95,7 +82,7 @@ public class VMStateManager {
 
 			case SHUTDOWN :
 				if (target == VMState.LAUNCH_PENDING || target == VMState.DELETE_PENDING ||
-						target == VMState.MIGRATE_PENDING) {
+						target == VMState.MIGRATE_PENDING || target == VMState.IMAGE_SHARE_PENDING ) {
 					canTrasist = true;
 				}
 				break;
@@ -107,6 +94,8 @@ public class VMStateManager {
 				break;
 
 			case MIGRATE_PENDING :
+
+			case IMAGE_SHARE_PENDING:
 				if(target == VMState.SHUTDOWN) {
 					canTrasist = true;
 				}

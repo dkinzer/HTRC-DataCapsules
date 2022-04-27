@@ -13,21 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package edu.indiana.d2i.sloan.vm;
+package edu.indiana.d2i.sloan.image;
 
-public enum VMState {
-	CREATE_PENDING,
-	LAUNCH_PENDING,
-	RUNNING,
-	SWITCH_TO_MAINTENANCE_PENDING,
-	SWITCH_TO_SECURE_PENDING,
-	SHUTDOWN_PENDING,
-	SHUTDOWN,
-	DELETE_PENDING,
-	ERROR,
+public enum ImageState {
+	SHARE_PENDING,
 	DELETED,
-	DELETE_ERROR,
-	MIGRATE_PENDING,
-	IMAGE_SHARE_PENDING,
-	NOT_DEFINED
+	ACTIVE,
+	DELETE_PENDING,
+	ERROR
 }

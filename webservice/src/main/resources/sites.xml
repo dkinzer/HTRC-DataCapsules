@@ -77,6 +77,14 @@
 		<name>cmd.delete.key</name>
 		<value>DB_HOST_SCRIPT_DIR/deletekey.sh</value>
 	</property>
+	<property>
+		<name>cmd.share.image</name>
+		<value>DB_HOST_SCRIPT_DIR/shareimage.sh</value>
+	</property>
+	<property>
+		<name>cmd.delete.image</name>
+		<value>DB_HOST_SCRIPT_DIR/deleteimage.sh</value>
+	</property>
 
 	<!-- fire wall policy -->
 	<property>
@@ -149,6 +157,10 @@
 	<property>
 		<name>user.memory.quota.in.mb</name>
 		<value>20480</value>
+	</property>
+	<property>
+		<name>user.image.quota.in.num</name>
+		<value>5</value>
 	</property>
 
 	<!-- scheduler -->
@@ -227,5 +239,9 @@
 	<property>
 		<name>max.no.of.sharees</name>
 		<value>6</value>
+	</property>
+	<property>
+		<name>host.image.dir</name>
+		<value>/home/htrcprod/resources/images/</value>
 	</property>
 </configuration>

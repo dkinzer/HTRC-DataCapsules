@@ -48,7 +48,9 @@
 		<url-pattern>/show</url-pattern>
 		<url-pattern>/stopvm</url-pattern>
 		<url-pattern>/switchvm</url-pattern>
-		<url-pattern>/listimage</url-pattern>
+		<url-pattern>/listactiveimages</url-pattern>
+		<url-pattern>/listallimages</url-pattern>
+		<url-pattern>/listmyimages</url-pattern>
 		<url-pattern>/updateuserkey</url-pattern>
 		<url-pattern>/updateusertou</url-pattern>
 		<url-pattern>/updatevm</url-pattern>
@@ -63,6 +65,12 @@
 		<url-pattern>/exitsharee</url-pattern>
 		<url-pattern>/addsupportuser</url-pattern>
 		<url-pattern>/checkdownloadability</url-pattern>
+		<url-pattern>/activateimage</url-pattern>
+		<url-pattern>/checkimagename</url-pattern>
+		<url-pattern>/deleteimage</url-pattern>
+		<url-pattern>/getimage</url-pattern>
+		<url-pattern>/shareimage</url-pattern>
+		<url-pattern>/requestimagedelete</url-pattern>
 	</filter-mapping>
 
 	<servlet-mapping>

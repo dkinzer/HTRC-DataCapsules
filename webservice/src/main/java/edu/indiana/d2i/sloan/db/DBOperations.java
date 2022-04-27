@@ -19,6 +19,7 @@ import edu.indiana.d2i.sloan.Configuration;
 import edu.indiana.d2i.sloan.bean.*;
 import edu.indiana.d2i.sloan.exception.NoItemIsFoundInDBException;
 import edu.indiana.d2i.sloan.exception.ResultExpireException;
+import edu.indiana.d2i.sloan.image.ImageState;
 import edu.indiana.d2i.sloan.result.ResultState;
 import edu.indiana.d2i.sloan.vm.VMMode;
 import edu.indiana.d2i.sloan.vm.VMPorts;
@@ -171,6 +172,7 @@ public class DBOperations {
 						.collect(Collectors.toList()).get(0);
 				VmInfoBean vminfo = new VmInfoBean(
 						rs.getString(DBSchema.VmTable.VM_ID),
+						rs.getString(DBSchema.VmTable.VM_NAME),
 						rs.getString(DBSchema.VmTable.HOST),
 						DATE_FORMATOR.format(rs.getTimestamp(DBSchema.VmTable.CREATED_AT)),
 						rs.getString(DBSchema.VmTable.WORKING_DIR),
@@ -189,6 +191,7 @@ public class DBOperations {
 						rs.getString(DBSchema.VmTable.VNC_PASSWORD),
 						rs.getString(DBSchema.ImageTable.IMAGE_LOGIN_ID),
 						rs.getString(DBSchema.ImageTable.IMAGE_LOGIN_PASSWORD),
+						rs.getString(DBSchema.VmTable.IMAGE_ID),
 						rs.getString(DBSchema.VmTable.IMAGE_NAME),
 						null, null,
 						rs.getString(DBSchema.VmTable.TYPE),
@@ -341,10 +344,10 @@ public class DBOperations {
 				// ignore the error if there is a duplicate
 				String insertUser = String.format(
 					"INSERT IGNORE INTO " + DBSchema.UserTable.TABLE_NAME
-							+ "(%s, %s, %s, %s, %s) VALUES" + "(?, ?, ?, ?, ?)",
+							+ "(%s, %s, %s, %s, %s, %s) VALUES" + "(?, ?, ?, ?, ?, ?)",
 					DBSchema.UserTable.GUID, DBSchema.UserTable.USER_EMAIL,
 					DBSchema.UserTable.DISK_LEFT_QUOTA, DBSchema.UserTable.CPU_LEFT_QUOTA, 
-					DBSchema.UserTable.MEMORY_LEFT_QUOTA);
+					DBSchema.UserTable.MEMORY_LEFT_QUOTA, DBSchema.UserTable.IMAGE_LEFT_QUOTA);
 				pst2 = connection.prepareStatement(insertUser);
 				pst2.setString(1, userName);
 				pst2.setString(2, userEmail);
@@ -354,6 +357,8 @@ public class DBOperations {
 					getInt(Configuration.PropertyName.USER_CPU_QUOTA_IN_NUM)); // vcpus
 				pst2.setInt(5, Configuration.getInstance().
 					getInt(Configuration.PropertyName.USER_MEMORY_QUOTA_IN_MB)); // memory size in MB
+				pst2.setInt(6, Configuration.getInstance().
+						getInt(Configuration.PropertyName.USER_IMAGE_QUOTA_IN_NUM)); // number of images user can share
 				pst2.executeUpdate();
 			}
 		} finally {
@@ -371,7 +376,8 @@ public class DBOperations {
 	public List<VmInfoBean> getAllVmInfo() throws SQLException, NoItemIsFoundInDBException {
 		String sql = String.format("SELECT " + DBSchema.VmTable.VM_MODE + ","
 				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.VM_ID
-				+ "," + DBSchema.VmTable.HOST + "," + DBSchema.VmTable.CREATED_AT + ","
+				+ "," + DBSchema.VmTable.VM_NAME + ","  + DBSchema.VmTable.HOST
+				+ "," + DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.CREATED_AT + ","
 				+ DBSchema.VmTable.STATE + "," + DBSchema.VmTable.SSH_PORT
 				+ "," + DBSchema.VmTable.VNC_PORT + ","
 				+ DBSchema.VmTable.WORKING_DIR + ","
@@ -380,6 +386,7 @@ public class DBOperations {
 				+ DBSchema.VmTable.NUM_CPUS + ","
 				+ DBSchema.VmTable.MEMORY_SIZE + ","
 				+ DBSchema.VmTable.DISK_SPACE + ","
+				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_ID + ","
 				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_NAME + ","
 				+ DBSchema.VmTable.TYPE + "," + DBSchema.VmTable.TITLE + ","
 				+ DBSchema.VmTable.CONSENT + "," + DBSchema.VmTable.DESC_NATURE + ","
@@ -390,8 +397,8 @@ public class DBOperations {
 				+ DBSchema.ImageTable.IMAGE_LOGIN_PASSWORD 
 				// + image path & policy path
 				+ " FROM " + DBSchema.VmTable.TABLE_NAME + "," + DBSchema.ImageTable.TABLE_NAME
-				+ " WHERE " + DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_NAME + "=" 
-				+ DBSchema.ImageTable.TABLE_NAME + "." + DBSchema.ImageTable.IMAGE_NAME
+				+ " WHERE " + DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_ID + "="
+				+ DBSchema.ImageTable.TABLE_NAME + "." + DBSchema.ImageTable.IMAGE_ID
 				+ " AND " + DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.STATE + "!= \""
 				+ VMState.DELETED.toString() + "\"");
 
@@ -406,7 +413,8 @@ public class DBOperations {
 	public VmInfoBean getAllVmInfoByID(String vmid) throws SQLException, NoItemIsFoundInDBException {
 		String sql = String.format("SELECT " + DBSchema.VmTable.VM_MODE + ","
 				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.VM_ID
-				+ "," + DBSchema.VmTable.HOST + "," + DBSchema.VmTable.CREATED_AT + ","
+				+ "," + DBSchema.VmTable.VM_NAME + "," + DBSchema.VmTable.HOST
+				+ "," + DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.CREATED_AT + ","
 				+ DBSchema.VmTable.STATE + "," + DBSchema.VmTable.SSH_PORT
 				+ "," + DBSchema.VmTable.VNC_PORT + ","
 				+ DBSchema.VmTable.WORKING_DIR + ","
@@ -415,6 +423,7 @@ public class DBOperations {
 				+ DBSchema.VmTable.NUM_CPUS + ","
 				+ DBSchema.VmTable.MEMORY_SIZE + ","
 				+ DBSchema.VmTable.DISK_SPACE + ","
+				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_ID + ","
 				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_NAME + ","
 				+ DBSchema.VmTable.TYPE + "," + DBSchema.VmTable.TITLE + ","
 				+ DBSchema.VmTable.CONSENT + "," + DBSchema.VmTable.DESC_NATURE + ","
@@ -425,8 +434,8 @@ public class DBOperations {
 				+ DBSchema.ImageTable.IMAGE_LOGIN_PASSWORD
 				// + image path & policy path
 				+ " FROM " + DBSchema.VmTable.TABLE_NAME + "," + DBSchema.ImageTable.TABLE_NAME
-				+ " WHERE " + DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_NAME + "="
-				+ DBSchema.ImageTable.TABLE_NAME + "." + DBSchema.ImageTable.IMAGE_NAME
+				+ " WHERE " + DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_ID + "="
+				+ DBSchema.ImageTable.TABLE_NAME + "." + DBSchema.ImageTable.IMAGE_ID
 				+ " AND " + DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.VM_ID + "=\"%s\""
 				+ " AND " + DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.STATE + "!= \""
 				+ VMState.DELETED.toString() + "\"", vmid);
@@ -442,7 +451,8 @@ public class DBOperations {
 	public List<VmInfoBean> getExistingVmInfo() throws SQLException {
 		String sql = "SELECT " + DBSchema.VmTable.VM_MODE + ","
 				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.VM_ID
-				+ "," + DBSchema.VmTable.HOST + "," + DBSchema.VmTable.CREATED_AT + ","
+				+ "," + DBSchema.VmTable.VM_NAME + "," + DBSchema.VmTable.HOST
+				+ "," + DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.CREATED_AT + ","
 				+ DBSchema.VmTable.STATE + "," + DBSchema.VmTable.SSH_PORT
 				+ "," + DBSchema.VmTable.VNC_PORT + ","
 				+ DBSchema.VmTable.WORKING_DIR + ","
@@ -451,6 +461,7 @@ public class DBOperations {
 				+ DBSchema.VmTable.NUM_CPUS + ","
 				+ DBSchema.VmTable.MEMORY_SIZE + ","
 				+ DBSchema.VmTable.DISK_SPACE + ","
+				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_ID + ","
 				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_NAME + ","
 				+ DBSchema.VmTable.TYPE + "," + DBSchema.VmTable.TITLE + ","
 				+ DBSchema.VmTable.CONSENT + "," + DBSchema.VmTable.DESC_NATURE + ","
@@ -461,8 +472,8 @@ public class DBOperations {
 				+ DBSchema.ImageTable.IMAGE_LOGIN_PASSWORD
 				// + image path & policy path
 				+ " FROM " + DBSchema.VmTable.TABLE_NAME + "," + DBSchema.ImageTable.TABLE_NAME
-				+ " WHERE " + DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_NAME + "="
-				+ DBSchema.ImageTable.TABLE_NAME + "." + DBSchema.ImageTable.IMAGE_NAME
+				+ " WHERE " + DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_ID + "="
+				+ DBSchema.ImageTable.TABLE_NAME + "." + DBSchema.ImageTable.IMAGE_ID
 				+ " AND " + DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.STATE + " NOT LIKE \"%%" + DELETE + "%%\"";
 		return getVmInfoInternal(sql);
 	}
@@ -470,7 +481,8 @@ public class DBOperations {
 	public List<VmInfoBean> getVmInfo(String userName) throws SQLException {
 		String sql = String.format("SELECT " + DBSchema.VmTable.VM_MODE + ","
 				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.VM_ID
-				+ "," + DBSchema.VmTable.HOST + "," + DBSchema.VmTable.CREATED_AT + ","
+				+ "," + DBSchema.VmTable.HOST + "," + DBSchema.VmTable.VM_NAME + ","
+				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.CREATED_AT + ","
 				+ DBSchema.VmTable.STATE + "," + DBSchema.VmTable.SSH_PORT
 				+ "," + DBSchema.VmTable.VNC_PORT + ","
 				+ DBSchema.VmTable.WORKING_DIR + ","
@@ -479,6 +491,7 @@ public class DBOperations {
 				+ DBSchema.VmTable.NUM_CPUS + ","
 				+ DBSchema.VmTable.MEMORY_SIZE + ","
 				+ DBSchema.VmTable.DISK_SPACE + ","
+				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_ID + ","
 				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_NAME + ","
 				+ DBSchema.VmTable.TYPE + "," + DBSchema.VmTable.TITLE + ","
 				+ DBSchema.VmTable.CONSENT + "," + DBSchema.VmTable.DESC_NATURE + ","
@@ -492,8 +505,8 @@ public class DBOperations {
 				+ DBSchema.VmTable.TABLE_NAME
 				+ "," + DBSchema.UserVmMapTable.TABLE_NAME
 				+ " WHERE "
-				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_NAME + "="
-				+ DBSchema.ImageTable.TABLE_NAME + "." + DBSchema.ImageTable.IMAGE_NAME
+				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_ID + "="
+				+ DBSchema.ImageTable.TABLE_NAME + "." + DBSchema.ImageTable.IMAGE_ID
 				+ " AND " + DBSchema.UserVmMapTable.TABLE_NAME + "." + DBSchema.UserVmMapTable.GUID + "=\"%s\""
 				+ " AND " + DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.VM_ID + "="
 				+ DBSchema.UserVmMapTable.TABLE_NAME + "." + DBSchema.UserVmMapTable.VM_ID
@@ -504,8 +517,9 @@ public class DBOperations {
 	public VmInfoBean getVmInfo(String userName, String vmid)
 			throws SQLException, NoItemIsFoundInDBException {
 		String sql = String.format("SELECT " + DBSchema.VmTable.VM_MODE + ","
-				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.VM_ID
-				+ "," + DBSchema.VmTable.HOST + "," + DBSchema.VmTable.CREATED_AT + ","
+				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.VM_ID + ","
+				+ DBSchema.VmTable.VM_NAME + "," + DBSchema.VmTable.HOST + ","
+				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.CREATED_AT + ","
 				+ DBSchema.VmTable.STATE + "," + DBSchema.VmTable.SSH_PORT
 				+ "," + DBSchema.VmTable.VNC_PORT + ","
 				+ DBSchema.VmTable.WORKING_DIR + ","
@@ -514,6 +528,7 @@ public class DBOperations {
 				+ DBSchema.VmTable.NUM_CPUS + ","
 				+ DBSchema.VmTable.MEMORY_SIZE + ","
 				+ DBSchema.VmTable.DISK_SPACE + ","
+				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_ID + ","
 				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_NAME + ","
 				+ DBSchema.VmTable.TYPE + "," + DBSchema.VmTable.TITLE + ","
 				+ DBSchema.VmTable.CONSENT + "," + DBSchema.VmTable.DESC_NATURE + ","
@@ -526,8 +541,8 @@ public class DBOperations {
 				+ " FROM " + DBSchema.VmTable.TABLE_NAME + "," + DBSchema.ImageTable.TABLE_NAME
 				+ "," + DBSchema.UserVmMapTable.TABLE_NAME
 				+ " WHERE "
-				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_NAME + "="
-				+ DBSchema.ImageTable.TABLE_NAME + "." + DBSchema.ImageTable.IMAGE_NAME
+				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_ID + "="
+				+ DBSchema.ImageTable.TABLE_NAME + "." + DBSchema.ImageTable.IMAGE_ID
 				+ " AND " + DBSchema.UserVmMapTable.TABLE_NAME + "." + DBSchema.UserVmMapTable.GUID + "=\"%s\""
 				+ " AND " + DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.VM_ID + "=\"%s\""
 				+ " AND " + DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.VM_ID + "="
@@ -547,7 +562,8 @@ public class DBOperations {
 			throws SQLException, NoItemIsFoundInDBException {
 		String sql = String.format("SELECT " + DBSchema.VmTable.VM_MODE + ","
 				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.VM_ID
-				+ "," + DBSchema.VmTable.HOST + "," + DBSchema.VmTable.CREATED_AT + ","
+				+ "," + DBSchema.VmTable.VM_NAME + "," + DBSchema.VmTable.HOST
+				+ "," + DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.CREATED_AT + ","
 				+ DBSchema.VmTable.STATE + "," + DBSchema.VmTable.SSH_PORT
 				+ "," + DBSchema.VmTable.VNC_PORT + ","
 				+ DBSchema.VmTable.WORKING_DIR + ","
@@ -556,6 +572,7 @@ public class DBOperations {
 				+ DBSchema.VmTable.NUM_CPUS + ","
 				+ DBSchema.VmTable.MEMORY_SIZE + ","
 				+ DBSchema.VmTable.DISK_SPACE + ","
+				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_ID + ","
 				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_NAME + ","
 				+ DBSchema.VmTable.TYPE + "," + DBSchema.VmTable.TITLE + ","
 				+ DBSchema.VmTable.CONSENT + "," + DBSchema.VmTable.DESC_NATURE + ","
@@ -567,8 +584,8 @@ public class DBOperations {
 				// + image path & policy path
 				+ " FROM " + DBSchema.VmTable.TABLE_NAME + "," + DBSchema.ImageTable.TABLE_NAME
 				+ " WHERE "
-				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_NAME + "="
-				+ DBSchema.ImageTable.TABLE_NAME + "." + DBSchema.ImageTable.IMAGE_NAME
+				+ DBSchema.VmTable.TABLE_NAME + "." + DBSchema.VmTable.IMAGE_ID + "="
+				+ DBSchema.ImageTable.TABLE_NAME + "." + DBSchema.ImageTable.IMAGE_ID
 				+ " AND " + DBSchema.VmTable.TABLE_NAME + "."
 				+ DBSchema.VmTable.VM_ID + "=\"%s\""
 				+ " AND " + DBSchema.VmTable.STATE + " NOT LIKE \"%%" + DELETE + "%%\"", vmid);
@@ -582,7 +599,7 @@ public class DBOperations {
 		return res.get(0);
 	}
 
-	public void addVM(String userName, String vmid, String imageName,
+	public void addVM(String userName, String vmid, String vmName, String imageId, String imageName,
 			String vncLoginId, String vncLoginPwd, VMPorts host, String created_at,
 			String workDir, int numCPUs, int memorySize, int diskSpace, String type, String title, Boolean consent,
 			String desc_nature, String desc_requirement, String desc_links, String desc_outside_data,
@@ -593,6 +610,8 @@ public class DBOperations {
 								+ DBSchema.VmTable.TABLE_NAME
 								+ " ("
 								+ DBSchema.VmTable.VM_ID
+								+ ","
+								+ DBSchema.VmTable.VM_NAME
 								+ ","
 								+ DBSchema.VmTable.STATE
 								+ ","
@@ -607,6 +626,8 @@ public class DBOperations {
 								+ DBSchema.VmTable.VNC_PORT
 								+ ","
 								+ DBSchema.VmTable.WORKING_DIR
+								+ ","
+								+ DBSchema.VmTable.IMAGE_ID
 								+ ","
 								+ DBSchema.VmTable.IMAGE_NAME
 								+ ","
@@ -642,11 +663,11 @@ public class DBOperations {
 								+ ","
 								+ DBSchema.VmTable.DESC_SHARED
 								+ ") VALUES"
-								+ "(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %d, %d, \"%s\", \"%s\", \"%s\", \"%s\", %d, %d, %d, \"%s\"" +
+								+ "(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %d, %d, \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", %d, %d, %d, \"%s\"" +
 								", \"%s\", %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-						vmid, VMState.CREATE_PENDING.toString(),
+						vmid,vmName, VMState.CREATE_PENDING.toString(),
 						VMMode.NOT_DEFINED.toString(), host.publicip, created_at,
-						host.sshport, host.vncport, workDir, imageName,
+						host.sshport, host.vncport, workDir, imageId, imageName,
 						vncLoginId, vncLoginPwd, numCPUs, memorySize,
 						diskSpace, userName, type,
 						title != null ? "\"" + StringEscapeUtils.escapeJava(title) + "\"" : title,
@@ -1018,7 +1039,40 @@ public class DBOperations {
 		executeTransaction(updates);
 	}
 
-	public String getImagePath(String imageName) throws SQLException {
+	public void addImage(ImageInfoBean imageInfoBean) throws SQLException {
+		Connection connection = null;
+		PreparedStatement pst = null;
+		try {
+			String insertResult = String.format(
+					"INSERT INTO " + DBSchema.ImageTable.TABLE_NAME + " (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES" + "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+					DBSchema.ImageTable.IMAGE_ID, DBSchema.ImageTable.IMAGE_NAME, DBSchema.ImageTable.IMAGE_STATUS, DBSchema.ImageTable.IMAGE_DESCRIPTION, DBSchema.ImageTable.IMAGE_PATH,
+					DBSchema.ImageTable.IMAGE_LOGIN_ID, DBSchema.ImageTable.IMAGE_LOGIN_PASSWORD,  DBSchema.ImageTable.SOURCE_VM, DBSchema.ImageTable.PUBLIC,
+					DBSchema.ImageTable.OWNER, DBSchema.ImageTable.CREATED_AT, DBSchema.ImageTable.UPDATED_AT);
+
+			connection = DBConnections.getInstance().getConnection();
+			pst = connection.prepareStatement(insertResult);
+			pst.setString(1, imageInfoBean.getImageId());
+			pst.setString(2, imageInfoBean.getImageName());
+			pst.setString(3, imageInfoBean.getImageStatus().toString());
+			pst.setString(4, imageInfoBean.getImageDescription());
+			pst.setString(5, imageInfoBean.getImagePath());
+			pst.setString(6, imageInfoBean.getLoginUserName());
+			pst.setString(7, imageInfoBean.getLoginPassWord());
+			pst.setString(8, imageInfoBean.getSourceVM());
+			pst.setBoolean(9, imageInfoBean.getPublic());
+			pst.setString(10, imageInfoBean.getOwner());
+			pst.setString(11, imageInfoBean.getCreatedAt());
+			pst.setString(12, imageInfoBean.getUpdatedAt());
+			pst.executeUpdate();
+		} finally {
+			if (pst != null)
+				pst.close();
+			if (connection != null)
+				connection.close();
+		}
+	}
+
+	public String getImagePath(String imageId) throws SQLException {
 		Connection connection = null;
 		PreparedStatement pst1 = null;
 		PreparedStatement pst2 = null;
@@ -1028,9 +1082,9 @@ public class DBOperations {
 			connection = DBConnections.getInstance().getConnection();
 			String queryUser = "SELECT * FROM "
 					+ DBSchema.ImageTable.TABLE_NAME + " WHERE "
-					+ DBSchema.ImageTable.IMAGE_NAME + "=(?)";
+					+ DBSchema.ImageTable.IMAGE_ID + "=(?)";
 			pst1 = connection.prepareStatement(queryUser);
-			pst1.setString(1, imageName);
+			pst1.setString(1, imageId);
 			rs = pst1.executeQuery();
 			if (rs.next()) {
 				return rs.getString(DBSchema.ImageTable.IMAGE_PATH);
@@ -1048,24 +1102,37 @@ public class DBOperations {
 				connection.close();
 		}
 	}
-	
-	public List<ImageInfoBean> getImageInfo() throws SQLException {
+
+	public ImageInfoBean getImageInfo(String imageId) throws SQLException {
 		Connection connection = null;
 		PreparedStatement pst1 = null;
 		PreparedStatement pst2 = null;
 		ResultSet rs = null;
 
-		List<ImageInfoBean> res = new ArrayList<ImageInfoBean>();
 		try {
 			connection = DBConnections.getInstance().getConnection();
-			String queryUser = "SELECT * FROM " + DBSchema.ImageTable.TABLE_NAME;
+			String queryUser = "SELECT * FROM "
+					+ DBSchema.ImageTable.TABLE_NAME + " WHERE "
+					+ DBSchema.ImageTable.IMAGE_ID + "=(?)";
 			pst1 = connection.prepareStatement(queryUser);
+			pst1.setString(1, imageId);
 			rs = pst1.executeQuery();
-			while (rs.next()) {
-				res.add(new ImageInfoBean(rs.getString(DBSchema.ImageTable.IMAGE_NAME),
-						rs.getString(DBSchema.ImageTable.IMAGE_STATUS),
-					rs.getString(DBSchema.ImageTable.IMAGE_DESCRIPTION)));
-			} 
+			if (rs.next()) {
+				return new ImageInfoBean(rs.getString(DBSchema.ImageTable.IMAGE_ID),
+						rs.getString(DBSchema.ImageTable.IMAGE_NAME),
+						ImageState.valueOf(rs.getString(DBSchema.ImageTable.IMAGE_STATUS)),
+						rs.getString(DBSchema.ImageTable.IMAGE_DESCRIPTION),
+						rs.getString(DBSchema.ImageTable.IMAGE_PATH),
+						rs.getString(DBSchema.ImageTable.IMAGE_LOGIN_ID),
+						rs.getString(DBSchema.ImageTable.IMAGE_LOGIN_PASSWORD),
+						rs.getString(DBSchema.ImageTable.SOURCE_VM),
+						rs.getBoolean(DBSchema.ImageTable.PUBLIC),
+						rs.getString(DBSchema.ImageTable.OWNER),
+						rs.getString(DBSchema.ImageTable.CREATED_AT),
+						rs.getString(DBSchema.ImageTable.UPDATED_AT));
+			} else {
+				return null;
+			}
 		} finally {
 			if (rs != null)
 				rs.close();
@@ -1076,8 +1143,179 @@ public class DBOperations {
 			if (connection != null)
 				connection.close();
 		}
+	}
+	
+	public List<ImageInfoBean> getImagesInfo() throws SQLException {
+		Connection connection = null;
+		PreparedStatement pst1 = null;
+		ResultSet rs = null;
+
+		List<ImageInfoBean> res = new ArrayList<ImageInfoBean>();
+		try {
+			connection = DBConnections.getInstance().getConnection();
+			String queryUser = "SELECT * FROM " + DBSchema.ImageTable.TABLE_NAME;
+			pst1 = connection.prepareStatement(queryUser);
+			rs = pst1.executeQuery();
+			while (rs.next()) {
+				res.add(new ImageInfoBean(rs.getString(DBSchema.ImageTable.IMAGE_ID),
+						rs.getString(DBSchema.ImageTable.IMAGE_NAME),
+						ImageState.valueOf(rs.getString(DBSchema.ImageTable.IMAGE_STATUS)),
+						rs.getString(DBSchema.ImageTable.IMAGE_DESCRIPTION),
+						rs.getString(DBSchema.ImageTable.IMAGE_PATH),
+						rs.getString(DBSchema.ImageTable.IMAGE_LOGIN_ID),
+						rs.getString(DBSchema.ImageTable.IMAGE_LOGIN_PASSWORD),
+						rs.getString(DBSchema.ImageTable.SOURCE_VM),
+						rs.getBoolean(DBSchema.ImageTable.PUBLIC),
+						rs.getString(DBSchema.ImageTable.OWNER),
+						rs.getString(DBSchema.ImageTable.CREATED_AT),
+						rs.getString(DBSchema.ImageTable.UPDATED_AT)));
+			} 
+		} finally {
+			if (rs != null)
+				rs.close();
+			if (pst1 != null)
+				pst1.close();
+			if (connection != null)
+				connection.close();
+		}
 		return res;
 	}
+
+	public void updateImage(String imageId, String imageName, String imageDescription, Boolean isPublic) throws SQLException {
+		Connection connection = null;
+		PreparedStatement pst = null;
+		java.util.Date dateobj = new java.util.Date();
+		java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String currentTime = df.format(dateobj);
+
+		try {
+			connection = DBConnections.getInstance().getConnection();
+			String updateImage = String.format("UPDATE "
+					+ DBSchema.ImageTable.TABLE_NAME + " SET "
+					+ DBSchema.ImageTable.IMAGE_NAME + "=\"%s\""
+					+ DBSchema.ImageTable.IMAGE_DESCRIPTION + "=\"%s\""
+					+ DBSchema.ImageTable.PUBLIC + "=\"%s\""
+					+ DBSchema.ImageTable.UPDATED_AT + "=\"%s\""
+					+ " WHERE " + DBSchema.ImageTable.IMAGE_ID + "=\"%s\"", imageName, imageDescription, isPublic, currentTime, imageId);
+			logger.debug(updateImage);
+			pst = connection.prepareStatement(updateImage);
+			pst.executeUpdate();
+		} finally {
+			if (pst != null)
+				pst.close();
+			if (connection != null)
+				connection.close();
+		}
+	}
+
+	public void updateImageState(String imageId, ImageState imageState) throws SQLException {
+		Connection connection = null;
+		PreparedStatement pst = null;
+
+		try {
+			connection = DBConnections.getInstance().getConnection();
+			String updateImage = String.format("UPDATE "
+					+ DBSchema.ImageTable.TABLE_NAME + " SET "
+					+ DBSchema.ImageTable.IMAGE_STATUS + "=\"%s\""
+					+ " WHERE " + DBSchema.ImageTable.IMAGE_ID + "=\"%s\"", imageState, imageId);
+			logger.debug(updateImage);
+			pst = connection.prepareStatement(updateImage);
+			pst.executeUpdate();
+		} finally {
+			if (pst != null)
+				pst.close();
+			if (connection != null)
+				connection.close();
+		}
+	}
+
+	public void restoreImageQuota(String userName) throws SQLException {
+
+		String sql = "SELECT " + DBSchema.UserTable.IMAGE_LEFT_QUOTA +
+				" FROM " + DBSchema.UserTable.TABLE_NAME +
+				" WHERE " + DBSchema.UserTable.GUID +
+				"=" +
+				(String.format("\"%s\"", userName));
+		try (Connection connection = DBConnections.getInstance().getConnection(); PreparedStatement pst = connection.prepareStatement(sql); ResultSet rs = pst.executeQuery()) {
+
+			if (rs.next()) {
+				int imageLeftQuota = rs.getInt(DBSchema.UserTable.IMAGE_LEFT_QUOTA);
+
+				String updateSql = "UPDATE " +
+						DBSchema.UserTable.TABLE_NAME +
+						" SET " +
+						String.format("%s=%d",
+								DBSchema.UserTable.IMAGE_LEFT_QUOTA,
+								imageLeftQuota + 1) +
+						" WHERE " +
+						DBSchema.UserTable.GUID +
+						"=" +
+						(String.format("\"%s\"", userName));
+				executeTransaction(Collections
+						.<String>singletonList(updateSql));
+			}
+		}
+
+	}
+
+	public boolean imageQuotaNotExceedLimit(String userName)
+			throws SQLException {
+
+		StringBuilder sql = new StringBuilder();
+
+		sql.append("SELECT ").append(DBSchema.UserTable.IMAGE_LEFT_QUOTA)
+				.append(" FROM ").append(DBSchema.UserTable.TABLE_NAME)
+				.append(" WHERE ").append(DBSchema.UserTable.GUID)
+				.append("=")
+				.append((String.format("\"%s\"", userName)));
+
+		Connection connection = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+
+		boolean satisfiable = false;
+
+		try {
+			connection = DBConnections.getInstance().getConnection();
+
+			pst = connection.prepareStatement(sql.toString());
+
+			rs = pst.executeQuery();
+			if (rs.next()) {
+				int imageLeftQuota = rs.getInt(DBSchema.UserTable.IMAGE_LEFT_QUOTA);
+				if( imageLeftQuota > 0) {
+					satisfiable = true;
+					/* update user table */
+					StringBuilder updateSql = new StringBuilder();
+					updateSql
+							.append("UPDATE ")
+							.append(DBSchema.UserTable.TABLE_NAME)
+							.append(" SET ")
+							.append(String.format("%s=%d",
+									DBSchema.UserTable.IMAGE_LEFT_QUOTA,
+									imageLeftQuota - 1))
+							.append(" WHERE ")
+							.append(DBSchema.UserTable.GUID)
+							.append("=")
+							.append((String.format("\"%s\"", userName)));
+
+					executeTransaction(Collections
+							.<String>singletonList(updateSql.toString()));
+				}
+			}
+		} finally {
+			if (rs != null)
+				rs.close();
+			if (pst != null)
+				pst.close();
+			if (connection != null)
+				connection.close();
+		}
+
+		return satisfiable;
+	}
+
+
 	
 	public ResultBean getResult(String randomid) throws 
 		SQLException, NoItemIsFoundInDBException, ParseException {

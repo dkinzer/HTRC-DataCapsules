@@ -97,7 +97,7 @@ public class CheckResultDownloadability {
 			if (span > 0 && ((currentT-startT)/1000) > span)
 				throw new ResultExpireException(randomid + " has been expired!");
 
-			logger.info("Result with " + randomid + " is being downloaded.");
+			logger.info("Result with " + randomid + " is downloadable.");
 			return Response.status(200).build();
 
 		} catch (NoItemIsFoundInDBException e) {

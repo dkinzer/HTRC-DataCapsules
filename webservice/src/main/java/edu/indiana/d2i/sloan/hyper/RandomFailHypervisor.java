@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Random;
 
 import edu.indiana.d2i.sloan.Configuration;
+import edu.indiana.d2i.sloan.bean.ImageInfoBean;
 import edu.indiana.d2i.sloan.bean.VmInfoBean;
 import edu.indiana.d2i.sloan.exception.RandomFailException;
 import edu.indiana.d2i.sloan.vm.VMPorts;
@@ -132,6 +133,16 @@ public class RandomFailHypervisor implements IHypervisor {
 
 	@Override
 	public HypervisorResponse migrateVM(VmInfoBean vminfo, VMPorts vmports) throws Exception {
+		return simulateRandProcess();
+	}
+
+	@Override
+	public HypervisorResponse shareImage(VmInfoBean vminfo, ImageInfoBean imageInfoBean) throws Exception {
+		return simulateRandProcess();
+	}
+
+	@Override
+	public HypervisorResponse deleteImage(VmInfoBean vminfo, ImageInfoBean imageInfoBean) throws Exception {
 		return simulateRandProcess();
 	}
 

@@ -67,6 +67,7 @@ public final class Configuration {
 		public static final String USER_DISK_QUOTA_IN_GB = "user.disk.quota.in.gb";
 		public static final String USER_CPU_QUOTA_IN_NUM = "user.cpu.quota.in.num";
 		public static final String USER_MEMORY_QUOTA_IN_MB = "user.memory.quota.in.mb";
+		public static final String USER_IMAGE_QUOTA_IN_NUM = "user.image.quota.in.num";
 
 		// scheduler related properties
 		public static final String SCHEDULER_IMPL_CLASS = "scheduler.impl.class";
@@ -81,6 +82,7 @@ public final class Configuration {
 		public static final String PORT_RANGE_MIN = "sloan.ws.port.range.min";
 		public static final String PORT_RANGE_MAX = "sloan.ws.port.range.max";
 		public static final String HOSTS = "sloan.ws.hosts";
+		public static final String HOST_IMAGE_DIR = "host.image.dir";
 
 		// hypervisor related properties
 
@@ -103,6 +105,8 @@ public final class Configuration {
 		public static final String CMD_UPDATE_CUSTOS_CREDS = "cmd.update.custos.creds";
 		public static final String MIGRATE_VM = "cmd.migrate.vm";
 		public static final String CMD_DELETE_KEY = "cmd.delete.key";
+		public static final String SHARE_IMAGE = "cmd.share.image";
+		public static final String DELETE_IMAGE = "cmd.delete.image";
 
 		/* hypervisor fire wall policy */
 		public static final String MAINTENANCE_FIREWALL_POLICY = "hypervisor.fw.maintenance";

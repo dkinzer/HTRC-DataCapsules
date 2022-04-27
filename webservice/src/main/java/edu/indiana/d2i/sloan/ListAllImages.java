@@ -33,9 +33,9 @@ import edu.indiana.d2i.sloan.bean.ImageInfoBean;
 import edu.indiana.d2i.sloan.bean.ListImageResponseBean;
 import edu.indiana.d2i.sloan.db.DBOperations;
 
-@Path("/listimage")
-public class ListImage {
-	private static Logger logger = LoggerFactory.getLogger(ListImage.class);
+@Path("/listallimages")
+public class ListAllImages {
+	private static Logger logger = LoggerFactory.getLogger(ListAllImages.class);
 
 //	@POST
 	
@@ -55,7 +55,8 @@ public class ListImage {
 		}
 
 		try {
-			List<ImageInfoBean> imageInfo = DBOperations.getInstance().getImageInfo();			
+			List<ImageInfoBean> imageInfo = DBOperations.getInstance().getImagesInfo();
+			imageInfo.removeIf(imageInfoBean -> !imageInfoBean.getPublic() && !imageInfoBean.getOwner().equals(userName));
 			return Response.status(200).entity(new ListImageResponseBean(imageInfo)).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);

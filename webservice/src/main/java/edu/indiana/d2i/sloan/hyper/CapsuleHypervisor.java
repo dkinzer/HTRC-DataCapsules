@@ -24,6 +24,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import edu.indiana.d2i.sloan.bean.ImageInfoBean;
 import edu.indiana.d2i.sloan.vm.VMPorts;
 import edu.indiana.d2i.sloan.vm.VMState;
 import org.slf4j.Logger;
@@ -455,6 +456,77 @@ class CapsuleHypervisor implements IHypervisor {
 			/* execute task */
 			CmdsExecResult res = executeRetriableTask(new CapsuleTask(sshProxy,
 					migrateVMCmd));
+
+			return HypervisorResponse.commandRes2HyResp(res);
+		} finally {
+			/* close ssh connection */
+			if (sshProxy != null)
+				sshProxy.close();
+		}
+	}
+
+
+	@Override
+	public HypervisorResponse shareImage(VmInfoBean vmInfo, ImageInfoBean imageInfoBean) throws Exception {
+		logger.debug("sharing the image of vm: " + vmInfo);
+
+		SSHProxy sshProxy = null;
+
+		try {
+			/* establish ssh connection */
+			sshProxy = establishSShCon(vmInfo.getPublicip(),
+					SSHProxy.SSH_DEFAULT_PORT);
+
+			/* compose script command */
+			String argList = new CommandUtils.ArgsBuilder().
+					addArgument("--wdir", vmInfo.getWorkDir()).
+					addArgument("--sourceimage", vmInfo.getImagepath()).
+					addArgument("--newimage", imageInfoBean.getImagePath()).build();
+
+			Commands shareImageCmd = new Commands(
+					Collections
+							.<String> singletonList(CommandUtils
+									.composeFullCommand(HYPERVISOR_CMD.SHARE_IMAGE,
+											argList)),
+					false);
+
+			/* execute task */
+			CmdsExecResult res = executeRetriableTask(new CapsuleTask(sshProxy,
+					shareImageCmd));
+
+			return HypervisorResponse.commandRes2HyResp(res);
+		} finally {
+			/* close ssh connection */
+			if (sshProxy != null)
+				sshProxy.close();
+		}
+	}
+
+	@Override
+	public HypervisorResponse deleteImage(VmInfoBean vmInfo, ImageInfoBean imageInfoBean) throws Exception {
+		logger.debug("Deleting the image ID: " + imageInfoBean.getImageId());
+
+		SSHProxy sshProxy = null;
+
+		try {
+			/* establish ssh connection */
+			sshProxy = establishSShCon(vmInfo.getPublicip(),
+					SSHProxy.SSH_DEFAULT_PORT);
+
+			/* compose script command */
+			String argList = new CommandUtils.ArgsBuilder().
+					addArgument("--imagepath", imageInfoBean.getImagePath()).build();
+
+			Commands deleteImageCmd = new Commands(
+					Collections
+							.<String> singletonList(CommandUtils
+									.composeFullCommand(HYPERVISOR_CMD.DELETE_IMAGE,
+											argList)),
+					false);
+
+			/* execute task */
+			CmdsExecResult res = executeRetriableTask(new CapsuleTask(sshProxy,
+					deleteImageCmd));
 
 			return HypervisorResponse.commandRes2HyResp(res);
 		} finally {

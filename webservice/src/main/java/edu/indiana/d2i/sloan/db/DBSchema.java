@@ -25,11 +25,13 @@ public class DBSchema {
 	public static class VmTable {
 		public static String TABLE_NAME = "vms";
 		public static String VM_ID = "vmid";
+		public static String VM_NAME = "vmname";
 		public static String VM_MODE = "vmmode";
 		public static String STATE = "vmstate";
 		public static String SSH_PORT = "sshport";
 		public static String VNC_PORT = "vncport";
 		public static String WORKING_DIR = "workingdir";
+		public static String IMAGE_ID = "imageid";
 		public static String IMAGE_NAME = "imagename";
 		public static String POLICY_NAME = "policyname";
 		public static String TYPE = "type";
@@ -71,21 +73,22 @@ public class DBSchema {
 		public static Map<String, Integer> columnIndex = new HashMap<String, Integer>() {
 			{
 				put(VM_ID, 1);
-				put(VM_MODE, 2);
-				put(STATE, 3);
-				put(SSH_PORT, 4);
-				put(VNC_PORT, 5);
-				put(WORKING_DIR, 6);
-				put(IMAGE_NAME, 7);
-				put(VNC_USERNAME, 8);
-				put(VNC_PASSWORD, 9);
-				put(NUM_CPUS, 10);
-				put(MEMORY_SIZE, 11);
-				put(DISK_SPACE, 12);
-				put(CREATED_AT, 13);
-				put(GUID, 14);
-				put(HOST, 15);
-				put(POLICY_NAME, 16);
+				put(VM_NAME,2);
+				put(VM_MODE, 3);
+				put(STATE, 4);
+				put(SSH_PORT, 5);
+				put(VNC_PORT, 6);
+				put(WORKING_DIR, 7);
+				put(IMAGE_NAME, 8);
+				put(VNC_USERNAME, 9);
+				put(VNC_PASSWORD, 10);
+				put(NUM_CPUS, 11);
+				put(MEMORY_SIZE, 12);
+				put(DISK_SPACE, 13);
+				put(CREATED_AT, 14);
+				put(GUID, 15);
+				put(HOST, 16);
+				put(POLICY_NAME, 17);
 			}
 		};
 	}
@@ -106,6 +109,9 @@ public class DBSchema {
 		
 		/* remaining disk space quota in GB */
 		public static String DISK_LEFT_QUOTA = "diskleftquota";
+
+		/* remaining CPU quota */
+		public static String IMAGE_LEFT_QUOTA = "imageleftquota";
 		
 		/* currently all users are of the same type */
 		public static String USER_TYPE = "usertype";
@@ -119,12 +125,18 @@ public class DBSchema {
 
 	public static class ImageTable {
 		public static String TABLE_NAME = "images";
+		public static String IMAGE_ID = "imageid";
 		public static String IMAGE_NAME = "imagename";
 		public static String IMAGE_STATUS = "status";
 		public static String IMAGE_PATH = "imagepath";
 		public static String IMAGE_LOGIN_ID = "loginusername";
 		public static String IMAGE_LOGIN_PASSWORD = "loginpassword";
 		public static String IMAGE_DESCRIPTION = "imagedescription";
+		public static String SOURCE_VM = "source_vm";
+		public static String PUBLIC = "public";
+		public static String OWNER = "owner";
+		public static String CREATED_AT = "created_at";
+		public static String UPDATED_AT = "updated_at";
 	}
 	
 	public static class ResultTable {

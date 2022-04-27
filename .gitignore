@@ -24,6 +24,7 @@ webservice/.idea/
 /out/
 /sloan-ws-1.2-SNAPSHOT/
 /tightvnc-tls/.gradle/
+notes
 /notes
 webservice/src/main/resources/dc-migration/mysql-dumps
 /webservice/DC-API-Image-table-migration.png
@@ -31,3 +32,5 @@ webservice/src/main/resources/dc-migration/mysql-dumps
 /webservice/.DS_Store
 
 
+/webservice/.gradle/
+/docker

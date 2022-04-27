@@ -50,7 +50,7 @@ public class RoundRobinScheduler extends Scheduler {
 				String created_at = DATE_FORMATOR.format(dt);
 
 				DBOperations.getInstance().addVM(request.getUserName(),
-						request.getVmId(), request.getImageName(),
+						request.getVmId(), request.getVmName(), request.getImageId(), request.getImageName(),
 						request.getVncLoginID(), request.getVncLoginPasswd(),
 						vmhost, created_at, workDir, request.getVcpu(),
 						request.getMemory(), request.getVolumeSizeInGB(),
@@ -65,13 +65,14 @@ public class RoundRobinScheduler extends Scheduler {
 				String email = DBOperations.getInstance().getUserEmail(request.getUserName());
 				roles.add(new VmUserRole(email, VMRole.OWNER_CONTROLLER, true, request.getUserName(), request.isFull_access()));
 
-				return new VmInfoBean(request.getVmId(), vmhost.publicip, created_at, workDir,
+				return new VmInfoBean(request.getVmId(), request.getVmName(), vmhost.publicip, created_at, workDir,
 						null, // image path
 						null, // policy path
 						vmhost.sshport, vmhost.vncport, 
 						request.getVcpu(), request.getMemory(), request.getVolumeSizeInGB(),
 						VMMode.NOT_DEFINED, VMState.CREATE_PENDING,
 						request.getVncLoginID(), request.getVncLoginPasswd(),
+						request.getImageId(),
 						request.getImageName(), 
 						null, null, /* login username && login password */
 						null /* policy name */, 

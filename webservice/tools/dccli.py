@@ -109,14 +109,14 @@ def switch_vm(vmid, guid, mode):
     print(data)
 
 
-def create_vm(guid, useremail, imagename, loginusername, loginpassword, memory, vcpu, type, concent, full_access,
+def create_vm(guid, useremail, imageid, loginusername, loginpassword, memory, vcpu, type, concent, full_access,
               title, desc_nature, desc_requirement, desc_links, desc_outside_data, rr_data_files, rr_result_usage):
     headers = {'Content-Type': 'application/x-www-form-urlencoded',
                'htrc-remote-user': guid,
                'htrc-remote-user-email': useremail}
 
     params = urllib.parse.urlencode(
-        {'imagename': imagename, 'loginusername': loginusername, 'loginpassword': loginpassword, 'memory': memory,
+        {'imageid': imageid, 'loginusername': loginusername, 'loginpassword': loginpassword, 'memory': memory,
          'vcpu': vcpu, 'type': type, 'concent': concent, 'full_access': full_access, 'title': title,
          'desc_nature': desc_nature, 'desc_requirement': desc_requirement, 'desc_links': desc_links,
          'desc_outside_data': desc_outside_data, 'rr_data_files': rr_data_files, 'rr_result_usage': rr_result_usage})
@@ -498,6 +498,135 @@ def remove_htrc_help_user(sharee_guid):
 
 
 
+def manage_controller(vm,guid,sharee_guid,action):
+    headers = {'Content-Type': 'application/x-www-form-urlencoded',
+               'htrc-remote-user': guid}
+
+    params = urllib.parse.urlencode(
+        {'vmId': vm,'controller': sharee_guid, 'action': action})
+
+    # POST the request
+    conn = http.client.HTTPConnection(DC_API, PORT)
+    conn.request("POST", '/sloan-ws/managecontroller', params, headers)
+    response = conn.getresponse()
+
+    data = response.read()
+    print(data)
+
+def list_all_images(guid):
+    headers = {'Content-Type': 'application/x-www-form-urlencoded',
+               'htrc-remote-user': guid}
+
+    # GET the request
+    conn = http.client.HTTPConnection(DC_API, PORT)
+    conn.request("GET", '/sloan-ws/listallimages', " ", headers)
+    response = conn.getresponse()
+
+    print(response.read())
+
+def list_my_images(guid):
+    headers = {'Content-Type': 'application/x-www-form-urlencoded',
+               'htrc-remote-user': guid}
+
+    # GET the request
+    conn = http.client.HTTPConnection(DC_API, PORT)
+    conn.request("GET", '/sloan-ws/listmyimages', " ", headers)
+    response = conn.getresponse()
+
+    print(response.read())
+
+def list_active_images(guid):
+    headers = {'Content-Type': 'application/x-www-form-urlencoded',
+               'htrc-remote-user': guid}
+
+    # GET the request
+    conn = http.client.HTTPConnection(DC_API, PORT)
+    conn.request("GET", '/sloan-ws/listactiveimages', " ", headers)
+    response = conn.getresponse()
+
+    print(response.read())
+
+def get_image(guid, image_id):
+    headers = {'Content-Type': 'application/x-www-form-urlencoded',
+               'htrc-remote-user': guid}
+
+    # GET the request
+    conn = http.client.HTTPConnection(DC_API, PORT)
+    conn.request("GET", '/sloan-ws/getimage?imageId=' + image_id, " ", headers)
+    response = conn.getresponse()
+
+    print(response.read())
+
+def check_image_name(guid, image_name):
+    headers = {'Content-Type': 'application/x-www-form-urlencoded',
+               'htrc-remote-user': guid}
+
+    # GET the request
+    conn = http.client.HTTPConnection(DC_API, PORT)
+    conn.request("GET", '/sloan-ws/checkimagename?imageName=' + image_name, " ", headers)
+    response = conn.getresponse()
+
+    print(response.read())
+
+def share_image(vm,guid,imageName, imageDescription, public):
+    headers = {'Content-Type': 'application/x-www-form-urlencoded',
+               'htrc-remote-user': guid}
+
+    params = urllib.parse.urlencode(
+        {'vmId': vm,'imageName': imageName, 'imageDescription': imageDescription,'public': public})
+
+    # POST the request
+    conn = http.client.HTTPConnection(DC_API, PORT)
+    conn.request("POST", '/sloan-ws/shareimage', params, headers)
+    response = conn.getresponse()
+
+    data = response.read()
+    print(data)
+
+def activate_image(imageId):
+    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+
+    params = urllib.parse.urlencode(
+        {'imageId': imageId})
+
+    # POST the request
+    conn = http.client.HTTPConnection(DC_API, PORT)
+    conn.request("PUT", '/sloan-ws/activateimage', params, headers)
+    response = conn.getresponse()
+
+    data = response.read()
+    print(data)
+
+def request_image_deletion(guid,imageId):
+    headers = {'Content-Type': 'application/x-www-form-urlencoded',
+               'htrc-remote-user': guid}
+
+    params = urllib.parse.urlencode(
+        {'imageId': imageId})
+
+    # POST the request
+    conn = http.client.HTTPConnection(DC_API, PORT)
+    conn.request("PUT", '/sloan-ws/requestimagedelete', params, headers)
+    response = conn.getresponse()
+
+    data = response.read()
+    print(data)
+
+def delete_image(guid,imageId):
+    headers = {'Content-Type': 'application/x-www-form-urlencoded',
+               'htrc-remote-user': guid}
+
+    params = urllib.parse.urlencode(
+        {'imageId': imageId})
+
+    # POST the request
+    conn = http.client.HTTPConnection(DC_API, PORT)
+    conn.request("DELETE", '/sloan-ws/deleteimage', params, headers)
+    response = conn.getresponse()
+
+    data = response.read()
+    print(data)
+
 
 
 if __name__ == '__main__':
@@ -523,7 +652,7 @@ if __name__ == '__main__':
     create = subparsers.add_parser('create', description='Create DC VM')
     create.add_argument('guid')
     create.add_argument('vmuseremail')
-    create.add_argument('imagename')
+    create.add_argument('imageid')
     create.add_argument('vncusername')
     create.add_argument('vncpassword')
     create.add_argument('memory')
@@ -611,6 +740,48 @@ if __name__ == '__main__':
     addhelpuser.add_argument('sharee_guid')
     addhelpuser.add_argument('sharee_email')
 
+    managecontroller = subparsers.add_parser('managecontroller', description='Manage the controller role.')
+    managecontroller.add_argument('vm')
+    managecontroller.add_argument('owner_guid')
+    managecontroller.add_argument('sharee_guid')
+    managecontroller.add_argument('action')
+
+    listallimages = subparsers.add_parser('listallimages', description='List all images.')
+    listallimages.add_argument('guid')
+
+    listmyimages = subparsers.add_parser('listmyimages', description='List my active and pending images.')
+    listmyimages.add_argument('guid')
+
+    listactiveimages = subparsers.add_parser('listactiveimages', description='List active images.')
+    listactiveimages.add_argument('guid')
+
+    getimage = subparsers.add_parser('getimage', description='Get image information.')
+    getimage.add_argument('guid')
+    getimage.add_argument('image_id')
+
+    checkimagename = subparsers.add_parser('checkimagename', description='Check image name availability.')
+    checkimagename.add_argument('guid')
+    checkimagename.add_argument('image_name')
+
+    shareimage = subparsers.add_parser('shareimage', description='Share the image of a capsule.')
+    shareimage.add_argument('vm')
+    shareimage.add_argument('guid')
+    shareimage.add_argument('image_name')
+    shareimage.add_argument('image_description')
+    shareimage.add_argument('public')
+
+    activateimage = subparsers.add_parser('activateimage', description='Activate the image.')
+    activateimage.add_argument('image_id')
+
+    requestimagedelete = subparsers.add_parser('requestimagedelete', description='Request to delete the image.')
+    requestimagedelete.add_argument('guid')
+    requestimagedelete.add_argument('image_id')
+
+    deleteimage = subparsers.add_parser('deleteimage', description='Delete the image.')
+    deleteimage.add_argument('guid')
+    deleteimage.add_argument('image_id')
+
+
     removehelpuser = subparsers.add_parser('removehelpuser', description='Remove HTRC help user from all capsules.')
     removehelpuser.add_argument('sharee_guid')
     removehelpuser.add_argument('sharee_email')
@@ -645,10 +816,10 @@ if __name__ == '__main__':
 
     if parsed.sub_commands == 'create':
         confirmation = query_yes_no(
-            'Are you sure you want to create a VM with image: ' + parsed.imagename + ', memory: ' + parsed.memory + ', vcpu: ' + parsed.vcpu + ' ?')
+            'Are you sure you want to create a VM with image: ' + parsed.imageid + ', memory: ' + parsed.memory + ', vcpu: ' + parsed.vcpu + ' ?')
         if confirmation:
-            print('Creating  VM with image:' + parsed.imagename + ', VNC User name:' + parsed.vncusername + ', VNC Password:' + parsed.vncpassword + ', memory: ' + parsed.memory + ', vcpu: ' + parsed.vcpu + '...')
-            create_vm(parsed.guid, parsed.vmuseremail, parsed.imagename, parsed.vncusername, parsed.vncpassword,
+            print('Creating  VM with image:' + parsed.imageid + ', VNC User name:' + parsed.vncusername + ', VNC Password:' + parsed.vncpassword + ', memory: ' + parsed.memory + ', vcpu: ' + parsed.vcpu + '...')
+            create_vm(parsed.guid, parsed.vmuseremail, parsed.imageid, parsed.vncusername, parsed.vncpassword,
                       parsed.memory, parsed.vcpu, parsed.type, parsed.concent, parsed.full_access, parsed.title, parsed.desc_nature,
                       parsed.desc_requirement, parsed.desc_links, parsed.desc_outside_data, parsed.rr_data_files, parsed.rr_result_usage)
 
@@ -746,6 +917,42 @@ if __name__ == '__main__':
     if parsed.sub_commands == 'addhelpuser':
         print('Add HTRC help user ' + parsed.sharee_email + ' to all capsules.')
         add_htrc_help_user(parsed.sharee_guid,parsed.sharee_email)
+
+    if parsed.sub_commands == 'managecontroller':
+        confirmation = query_yes_no('Are you sure you want to ' + parsed.action + ' controller role from/to user ' + parsed.sharee_guid +' ?')
+        if confirmation:
+            print(parsed.action + ' controller role from/to ' + parsed.sharee_guid + '....')
+            manage_controller(parsed.vm,parsed.owner_guid,parsed.sharee_guid, parsed.action)
+
+    if parsed.sub_commands == 'listallimages':
+        list_all_images(parsed.guid)
+
+    if parsed.sub_commands == 'listmyimages':
+        list_my_images(parsed.guid)
+
+    if parsed.sub_commands == 'listactiveimages':
+        list_active_images(parsed.guid)
+
+    if parsed.sub_commands == 'getimage':
+        get_image(parsed.guid, parsed.image_id)
+
+    if parsed.sub_commands == 'checkimagename':
+        check_image_name(parsed.guid, parsed.image_name)
+
+    if parsed.sub_commands == 'shareimage':
+        share_image(parsed.vm, parsed.guid, parsed.image_name, parsed.image_description, parsed.public)
+
+    if parsed.sub_commands == 'activateimage':
+        activate_image(parsed.image_id)
+
+    if parsed.sub_commands == 'requestimagedelete':
+        request_image_deletion(parsed.guid,parsed.image_id)
+
+    if parsed.sub_commands == 'deleteimage':
+        delete_image(parsed.guid,parsed.image_id)
+
+
+
 
     if parsed.sub_commands == 'removehelpuser':
         print('Remove HTRC help user ' + parsed.sharee_email + ' from all capsules.')

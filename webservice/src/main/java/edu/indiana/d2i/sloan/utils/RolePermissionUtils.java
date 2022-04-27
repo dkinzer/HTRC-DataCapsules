@@ -22,7 +22,7 @@ public class RolePermissionUtils {
 
     public enum API_CMD {
         DELETE_VM, LAUNCH_VM, QUERY_VM, MIGRATE_VM, SWITCH_VM, STOP_VM, UPDATE_VM, ADD_SHAREES, UPDATE_SSH_KEY,
-        DELETE_SHAREES, OBTAIN_CONTROLLER, VIEW_RESULT, UPDATE_CUSTOS_CREDS, EXIT_SHAREE, ADD_SUPPORT_USER
+        DELETE_SHAREES, OBTAIN_CONTROLLER, VIEW_RESULT, EXIT_SHAREE, ADD_SUPPORT_USER, SHARE_IMAGE,UPDATE_CUSTOS_CREDS
     }
 
     public enum CNTR_ACTION {
@@ -67,7 +67,8 @@ public class RolePermissionUtils {
                         || api_cmd == API_CMD.UPDATE_SSH_KEY
                         || api_cmd == API_CMD.UPDATE_CUSTOS_CREDS
                         || api_cmd == API_CMD.VIEW_RESULT
-                        || api_cmd == API_CMD.ADD_SUPPORT_USER) {
+                        || api_cmd == API_CMD.ADD_SUPPORT_USER
+                        || api_cmd == API_CMD.SHARE_IMAGE) {
                     isPermitted = true;
                 }
                 break;
@@ -83,7 +84,8 @@ public class RolePermissionUtils {
                         || api_cmd == API_CMD.UPDATE_CUSTOS_CREDS
                         || api_cmd == API_CMD.OBTAIN_CONTROLLER
                         || api_cmd == API_CMD.VIEW_RESULT
-                        || api_cmd == API_CMD.ADD_SUPPORT_USER) {
+                        || api_cmd == API_CMD.ADD_SUPPORT_USER
+                        || api_cmd == API_CMD.SHARE_IMAGE) {
                     isPermitted = true;
                 }
                 break;

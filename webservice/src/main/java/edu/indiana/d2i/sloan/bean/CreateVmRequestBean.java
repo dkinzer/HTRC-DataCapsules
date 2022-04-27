@@ -16,20 +16,22 @@
 package edu.indiana.d2i.sloan.bean;
 
 public class CreateVmRequestBean {
-	private String userName, imageName, vmid, vncLoginID, vncLoginPasswd, workDir;
+	private String userName, imageId, imageName, vmid, vmName, vncLoginID, vncLoginPasswd, workDir;
 	private int memory, vcpu, volumeSizeInGB;
 	private Boolean consent, full_access;
 	private String type, title, desc_nature, desc_requirement, desc_links,
 			desc_outside_data, rr_data_files, rr_result_usage, desc_shared;
 
-	public CreateVmRequestBean(String userName, String imageName, String vmid,
+	public CreateVmRequestBean(String userName, String imageId, String imageName, String vmid, String vmName,
 			String vncLoginID, String vncLoginPasswd, int memory, int vcpu,
 			int volumeSizeInGB, String workDir, String type, String title, Boolean consent, String desc_nature,
 			String desc_requirement, String desc_links, String desc_outside_data,
 			String rr_data_files, String rr_result_usage, Boolean full_access, String desc_shared) {
 		this.userName = userName;
+		this.imageId = imageId;
 		this.imageName = imageName;
 		this.vmid = vmid;
+		this.vmName = vmName;
 		this.vncLoginID = vncLoginID;
 		this.vncLoginPasswd = vncLoginPasswd;
 		this.memory = memory;
@@ -47,6 +49,22 @@ public class CreateVmRequestBean {
 		this.rr_data_files = rr_data_files;
 		this.rr_result_usage = rr_result_usage;
 		this.desc_shared = desc_shared;
+	}
+
+	public String getVmName() {
+		return vmName;
+	}
+
+	public void setVmName(String vmName) {
+		this.vmName = vmName;
+	}
+
+	public String getImageId() {
+		return imageId;
+	}
+
+	public void setImageId(String imageId) {
+		this.imageId = imageId;
 	}
 
 	public String getUserName() {
@@ -176,8 +194,8 @@ public class CreateVmRequestBean {
 	@Override
 	public String toString() {
 		return String
-				.format("[username=%s, imagename=%s, vmid=%s, vmloginID=%s vmloginPasswd=%s memory=%d, vcpu=%d, volumesize=%dGB, type=%s]",
-						userName, imageName, vmid, vncLoginID, vncLoginPasswd,
+				.format("[username=%s, imageid=%s, imagename=%s, vmid=%s, vmloginID=%s vmloginPasswd=%s memory=%d, vcpu=%d, volumesize=%dGB, type=%s]",
+						userName, imageId, imageName, vmid, vncLoginID, vncLoginPasswd,
 						memory, vcpu, volumeSizeInGB, type);
 	}
 

@@ -30,15 +30,13 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import edu.indiana.d2i.sloan.bean.*;
 import edu.indiana.d2i.sloan.exception.NoItemIsFoundInDBException;
+import edu.indiana.d2i.sloan.image.ImageState;
 import edu.indiana.d2i.sloan.vm.PortsPool;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import edu.indiana.d2i.sloan.bean.ErrorBean;
-import edu.indiana.d2i.sloan.bean.CreateVmRequestBean;
-import edu.indiana.d2i.sloan.bean.CreateVmResponseBean;
-import edu.indiana.d2i.sloan.bean.VmInfoBean;
 import edu.indiana.d2i.sloan.db.DBOperations;
 import edu.indiana.d2i.sloan.hyper.CreateVMCommand;
 import edu.indiana.d2i.sloan.hyper.HypervisorProxy;
@@ -52,7 +50,8 @@ public class CreateVM {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createVM(
-			@FormParam("imagename") String imageName,
+			@FormParam("vmname") String vmName,
+			@FormParam("imageid") String imageId,
 			@FormParam("loginusername") String loginusername,
 			@FormParam("loginpassword") String loginpassword,
 			@DefaultValue("1024") @FormParam("memory") int memory,
@@ -82,11 +81,11 @@ public class CreateVM {
 							"Username is not present in http header.")).build();
 		}
 
-		if (imageName == null || loginusername == null || loginpassword == null) {
+		if (imageId == null || loginusername == null || loginpassword == null) {
 			return Response
 					.status(400)
 					.entity(new ErrorBean(400,
-							"Image name, login username and login password cannot be empty!"))
+							"Image ID, login username and login password cannot be empty!"))
 					.build();
 		}
 		int volumeSizeInGB = Integer.valueOf(Configuration.getInstance()
@@ -102,23 +101,39 @@ public class CreateVM {
 			// check if ports are available
 
 			// check if image name is valid
-			String imagePath = DBOperations.getInstance().getImagePath(imageName);
-			if (imagePath == null) {
+			ImageInfoBean imageInfo = DBOperations.getInstance().getImageInfo(imageId);
+			if (imageInfo == null) {
 				return Response.status(400).entity(
 					new ErrorBean(400, 
-						String.format("Image %s does not exist!", imageName)))
+						String.format("Image %s does not exist!", imageId)))
 						.build();
 			}
+
+			if (!imageInfo.getImageStatus().equals(ImageState.ACTIVE)){
+				return Response.status(400).entity(
+						new ErrorBean(400,
+								String.format("Image %s is not in ACTIVE state!", imageId)))
+						.build();
+			}
+
+			String imageName = imageInfo.getImageName();
+			String imagePath = imageInfo.getImagePath();
 			
 			// check if policy name is valid
 
 			// vm parameters
 			String vmid = UUID.randomUUID().toString();
+
+			//if vm name is not provided, assign vmid to vmname
+			if(vmName == null) vmName = vmid;
+
+			logger.debug("VM NAME: " + vmName);
+
 			String workDir = FilenameUtils.concat(
 				Configuration.getInstance().getString(
 					Configuration.PropertyName.DEFAULT_VM_WORKDIR_PREFIX), vmid);
 			CreateVmRequestBean request = new CreateVmRequestBean(userName,
-					imageName, vmid, loginusername, loginpassword, memory,
+					imageId, imageName, vmid, vmName, loginusername, loginpassword, memory,
 					vcpu, volumeSizeInGB, workDir, type, title, consent, desc_nature, desc_requirement,  desc_links,
 					desc_outside_data, rr_data_files, rr_result_usage, full_access, null);
 			logger.info("User " + userName + " tries to create vm " + request);
